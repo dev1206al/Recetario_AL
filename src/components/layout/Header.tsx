@@ -1,4 +1,4 @@
-import { Sun, Moon, ChefHat } from 'lucide-react'
+import { Sun, Moon } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTheme } from '../../context/ThemeContext'
 
@@ -23,9 +23,7 @@ export default function Header({ title, right }: HeaderProps) {
         </h1>
       ) : (
         <Link to="/" className="flex items-center gap-2 select-none">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-accent">
-            <ChefHat size={18} className="text-white" />
-          </div>
+          <img src="/logo-al.svg" alt="Recetario AL" className="w-8 h-8 rounded-xl" />
           <span className="font-bold text-base tracking-tight" style={{ color: 'var(--text)' }}>
             Recetario <span className="text-accent">AL</span>
           </span>

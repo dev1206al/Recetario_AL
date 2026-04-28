@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { ChefHat, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
@@ -58,9 +58,7 @@ export default function Login() {
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="text-center space-y-3">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto" style={{ background: '#e8572a' }}>
-            <ChefHat size={32} className="text-white" />
-          </div>
+          <img src="/logo-al.svg" alt="Recetario AL" className="w-20 h-20 rounded-2xl mx-auto" />
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
               Recetario <span style={{ color: '#e8572a' }}>AL</span>
