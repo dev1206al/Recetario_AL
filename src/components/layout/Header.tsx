@@ -34,10 +34,9 @@ export default function Header({ title, right }: HeaderProps) {
 
         <div className="flex items-center gap-2">
           {right}
-          {/* Visible solo en tablet/desktop — en móvil está en el BottomNav */}
           <button
             onClick={toggle}
-            className="hidden md:flex w-9 h-9 rounded-xl items-center justify-center transition-colors"
+            className="flex w-9 h-9 rounded-xl items-center justify-center transition-colors"
             style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
             aria-label="Toggle theme"
           >
