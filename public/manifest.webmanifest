@@ -1,0 +1,24 @@
+{
+  "name": "Recetario AL",
+  "short_name": "Recetario",
+  "description": "Tu recetario digital personal",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#e8572a",
+  "background_color": "#0d0d0d",
+  "icons": [
+    {
+      "src": "/logo-al.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-al.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

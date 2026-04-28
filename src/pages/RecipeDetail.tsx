@@ -81,8 +81,11 @@ export default function RecipeDetail() {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30" />
 
-        {/* Nav bar */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-safe pt-3">
+        {/* Nav bar — safe-area-inset-top para modo standalone */}
+        <div
+          className="absolute top-0 left-0 right-0 flex items-center justify-between px-4"
+          style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}
+        >
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(-1)}

@@ -20,11 +20,11 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around px-2 md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-40 flex items-end justify-around px-2 md:hidden"
       style={{
         background: 'var(--surface)',
         borderTop: '1px solid var(--border)',
-        height: 'calc(4rem + env(safe-area-inset-bottom))',
+        /* El nav tiene 4rem de contenido + el safe area del home indicator */
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
@@ -41,11 +41,11 @@ export default function BottomNav() {
       {/* Nueva receta — FAB elevado */}
       <Link
         to="/recipes/new"
-        className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-colors"
+        className="flex flex-col items-center gap-0.5 px-3 pb-2 rounded-xl transition-colors"
         style={{ color: active('/recipes/new') ? '#e8572a' : 'var(--text-muted)' }}
       >
         <div
-          className="w-12 h-12 rounded-2xl flex items-center justify-center -mt-6 shadow-lg"
+          className="w-12 h-12 rounded-2xl flex items-center justify-center -mt-5 shadow-lg"
           style={{ background: '#e8572a' }}
         >
           <Plus size={24} className="text-white" />
@@ -59,10 +59,7 @@ export default function BottomNav() {
         className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-colors"
         style={{ color: 'var(--text-muted)' }}
       >
-        {theme === 'dark'
-          ? <Sun size={22} />
-          : <Moon size={22} />
-        }
+        {theme === 'dark' ? <Sun size={22} /> : <Moon size={22} />}
         <span className="text-xs font-medium">
           {theme === 'dark' ? 'Claro' : 'Oscuro'}
         </span>

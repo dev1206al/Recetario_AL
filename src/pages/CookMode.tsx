@@ -38,10 +38,12 @@ export default function CookMode() {
     <div className="min-h-dvh flex flex-col" style={{ background: 'var(--bg)' }}>
       {/* Header */}
       <div
-        className="flex items-center justify-between px-4 h-14 flex-shrink-0"
+        className="flex-shrink-0"
         style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}
       >
-        <div className="flex items-center gap-2">
+        <div aria-hidden style={{ height: 'env(safe-area-inset-top)' }} />
+        <div className="flex items-center justify-between px-4 h-14">
+          <div className="flex items-center gap-2">
           <button
             onClick={() => navigate(-1)}
             className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -56,27 +58,28 @@ export default function CookMode() {
           >
             <Home size={18} style={{ color: 'var(--text-muted)' }} />
           </Link>
-        </div>
+          </div>
 
-        <div className="text-center">
-          <p className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
-            {cat.emoji} Modo Cocinar
-          </p>
-          <p className="text-sm font-semibold leading-tight max-w-[160px] truncate" style={{ color: 'var(--text)' }}>
-            {recipe.title}
-          </p>
-        </div>
+          <div className="text-center">
+            <p className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+              {cat.emoji} Modo Cocinar
+            </p>
+            <p className="text-sm font-semibold leading-tight max-w-[160px] truncate" style={{ color: 'var(--text)' }}>
+              {recipe.title}
+            </p>
+          </div>
 
-        <button
-          onClick={toggle}
-          className="w-10 h-10 rounded-xl flex items-center justify-center"
-          style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
-        >
-          {theme === 'dark'
-            ? <Sun size={16} style={{ color: 'var(--text-muted)' }} />
-            : <Moon size={16} style={{ color: 'var(--text-muted)' }} />
-          }
-        </button>
+          <button
+            onClick={toggle}
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+          >
+            {theme === 'dark'
+              ? <Sun size={16} style={{ color: 'var(--text-muted)' }} />
+              : <Moon size={16} style={{ color: 'var(--text-muted)' }} />
+            }
+          </button>
+        </div>
       </div>
 
       {/* Tab switch */}

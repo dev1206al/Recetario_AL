@@ -185,34 +185,37 @@ export default function RecipeForm() {
     <div className="min-h-dvh" style={{ background: 'var(--bg)' }}>
       {/* Header */}
       <div
-        className="sticky top-0 z-40 flex items-center gap-3 px-4 h-14"
+        className="sticky top-0 z-40"
         style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}
       >
-        <div className="flex items-center gap-2">
-          <button onClick={() => navigate(-1)}>
-            <ArrowLeft size={22} style={{ color: 'var(--text)' }} />
+        <div aria-hidden style={{ height: 'env(safe-area-inset-top)' }} />
+        <div className="flex items-center gap-3 px-4 h-14">
+          <div className="flex items-center gap-2">
+            <button onClick={() => navigate(-1)}>
+              <ArrowLeft size={22} style={{ color: 'var(--text)' }} />
+            </button>
+            <Link to="/" className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+              <Home size={16} style={{ color: 'var(--text-muted)' }} />
+            </Link>
+          </div>
+          <h1 className="flex-1 font-semibold text-base" style={{ color: 'var(--text)' }}>
+            {isEdit ? 'Editar receta' : 'Nueva receta'}
+          </h1>
+          <button
+            onClick={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+            className="px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-60"
+            style={{ background: '#e8572a' }}
+          >
+            {isSubmitting ? 'Guardando...' : 'Guardar'}
           </button>
-          <Link to="/" className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
-            <Home size={16} style={{ color: 'var(--text-muted)' }} />
-          </Link>
         </div>
-        <h1 className="flex-1 font-semibold text-base" style={{ color: 'var(--text)' }}>
-          {isEdit ? 'Editar receta' : 'Nueva receta'}
-        </h1>
-        <button
-          onClick={handleSubmit(onSubmit)}
-          disabled={isSubmitting}
-          className="px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-60"
-          style={{ background: '#e8572a' }}
-        >
-          {isSubmitting ? 'Guardando...' : 'Guardar'}
-        </button>
       </div>
 
       {/* Section tabs */}
       <div
         className="sticky z-30 flex gap-1 px-4 py-2 overflow-x-auto no-scrollbar"
-        style={{ top: 56, background: 'var(--bg)', borderBottom: '1px solid var(--border)' }}
+        style={{ top: 'calc(3.5rem + env(safe-area-inset-top))', background: 'var(--bg)', borderBottom: '1px solid var(--border)' }}
       >
         {sections.map(s => (
           <button

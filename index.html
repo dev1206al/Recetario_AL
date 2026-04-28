@@ -3,18 +3,24 @@
   <head>
     <meta charset="UTF-8" />
 
-    <!-- Favicon para navegadores -->
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/logo-al.svg" />
-    <!-- Fallback PNG por si el navegador no soporta SVG favicon -->
     <link rel="alternate icon" type="image/png" href="/logo-al.png" />
 
-    <!-- Ícono para iOS "Añadir a pantalla de inicio" -->
-    <link rel="apple-touch-icon" href="/logo-al.png" />
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.webmanifest" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- iOS PWA -->
+    <link rel="apple-touch-icon" href="/logo-al.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Recetario AL" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- "default" adapta el color del texto de la barra de status a claro/oscuro -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <!-- Viewport con cover para que la app llegue hasta los bordes -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Color de la barra del navegador / PWA splash -->
     <meta name="theme-color" content="#e8572a" />
 
     <title>Recetario AL</title>
