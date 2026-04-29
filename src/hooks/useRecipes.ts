@@ -1,21 +1,26 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import type { Recipe, RecipeFormData } from '../types'
 import toast from 'react-hot-toast'
 
 export type SortBy = 'recent' | 'az' | 'difficulty'
 
-// ── Fetch all recipes for the logged-in user ─────────────────
+const PAGE_SIZE = 12
+
+// ── Infinite paginated recipes ────────────────────────────────
 export function useRecipes(search?: string, category?: string, sortBy: SortBy = 'recent') {
-  return useQuery({
+  const orderField = sortBy === 'az' ? 'title' : sortBy === 'difficulty' ? 'difficulty' : 'created_at'
+  const ascending = sortBy === 'az' || sortBy === 'difficulty'
+
+  return useInfiniteQuery({
     queryKey: ['recipes', search, category, sortBy],
-    queryFn: async (): Promise<Recipe[]> => {
-      const orderField = sortBy === 'az' ? 'title' : sortBy === 'difficulty' ? 'difficulty' : 'created_at'
-      const ascending = sortBy === 'az' || sortBy === 'difficulty'
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }): Promise<Recipe[]> => {
       let query = supabase
         .from('recipes')
         .select('*, photos:recipe_photos(id, url, is_cover, order_index)')
         .order(orderField, { ascending })
+        .range(pageParam, pageParam + PAGE_SIZE - 1)
 
       if (search) query = query.ilike('title', `%${search}%`)
       if (category && category !== 'all') query = query.eq('category', category)
@@ -24,6 +29,8 @@ export function useRecipes(search?: string, category?: string, sortBy: SortBy = 
       if (error) throw error
       return data as Recipe[]
     },
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === PAGE_SIZE ? allPages.length * PAGE_SIZE : undefined,
   })
 }
 

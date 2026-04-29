@@ -180,55 +180,40 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           className="fixed inset-0 z-50 flex items-end justify-center"
           onClick={() => setShowMenu(false)}
         >
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
           <div
-            className="relative w-full max-w-sm mx-4 mb-4 rounded-2xl overflow-hidden"
+            className="absolute inset-0"
+            style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+          />
+          <div
+            className="relative w-full max-w-sm mx-4 mb-6 rounded-2xl overflow-hidden"
             style={{
               background: 'var(--surface)',
               border: '1px solid var(--border)',
-              animation: 'slideUp 200ms ease',
+              animation: 'slideUp 260ms cubic-bezier(0.32,0.72,0,1)',
+              willChange: 'transform',
             }}
             onClick={e => e.stopPropagation()}
           >
-            {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-8 h-1 rounded-full" style={{ background: 'var(--border)' }} />
+            <div className="flex justify-center pt-2.5 pb-2">
+              <div className="w-9 h-1 rounded-full" style={{ background: 'var(--border)' }} />
             </div>
 
-            {/* Title */}
-            <p className="recipe-title text-sm font-semibold px-5 pt-1 pb-4 line-clamp-1" style={{ color: 'var(--text)' }}>
-              {recipe.title}
-            </p>
-
-            {/* Divider */}
-            <div style={{ height: 1, background: 'var(--border)' }} />
-
-            {/* Actions */}
-            <div className="p-2">
-              <button
-                onClick={() => { setShowMenu(false); navigate(`/recipes/${recipe.id}/cook`) }}
-                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium"
-                style={{ color: 'var(--text)' }}
-              >
-                <UtensilsCrossed size={16} style={{ color: '#e8572a' }} />
-                Modo Cocinar
-              </button>
-              <button
-                onClick={() => { setShowMenu(false); navigate(`/recipes/${recipe.id}/edit`) }}
-                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium"
-                style={{ color: 'var(--text)' }}
-              >
-                <Edit2 size={16} style={{ color: 'var(--text-muted)' }} />
-                Editar
-              </button>
-              <button
-                onClick={handleShare}
-                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium"
-                style={{ color: 'var(--text)' }}
-              >
-                <Share2 size={16} style={{ color: 'var(--text-muted)' }} />
-                Compartir
-              </button>
+            <div className="pb-2">
+              {[
+                { icon: <UtensilsCrossed size={16} style={{ color: '#e8572a' }} />, label: 'Modo Cocinar', action: () => { setShowMenu(false); navigate(`/recipes/${recipe.id}/cook`) } },
+                { icon: <Edit2 size={16} style={{ color: 'var(--text-muted)' }} />, label: 'Editar', action: () => { setShowMenu(false); navigate(`/recipes/${recipe.id}/edit`) } },
+                { icon: <Share2 size={16} style={{ color: 'var(--text-muted)' }} />, label: 'Compartir', action: handleShare },
+              ].map(({ icon, label, action }) => (
+                <button
+                  key={label}
+                  onClick={action}
+                  className="w-full flex items-center gap-4 px-5 py-3.5 text-sm"
+                  style={{ color: 'var(--text)' }}
+                >
+                  {icon}
+                  {label}
+                </button>
+              ))}
             </div>
 
             <div style={{ height: 'env(safe-area-inset-bottom)' }} />

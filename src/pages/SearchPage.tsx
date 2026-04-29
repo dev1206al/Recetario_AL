@@ -16,18 +16,37 @@ export default function SearchPage() {
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const deferredSearch = useDeferredValue(search)
   const inputRef = useRef<HTMLInputElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const t = setTimeout(() => inputRef.current?.focus(), 200)
     return () => clearTimeout(t)
   }, [])
 
-  const { data: recipes = [], isLoading } = useRecipes(
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useRecipes(
     deferredSearch || undefined,
     activeCategory === 'all' ? undefined : activeCategory,
   )
 
+  const recipes = data?.pages.flat() ?? []
   const hasQuery = !!deferredSearch || activeCategory !== 'all'
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage() },
+      { rootMargin: '200px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   return (
     <Layout>
@@ -104,6 +123,11 @@ export default function SearchPage() {
                 <RecipeCard recipe={recipe} />
               </div>
             ))}
+          </div>
+          <div ref={sentinelRef} className="h-12 flex items-center justify-center mt-2">
+            {isFetchingNextPage && (
+              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#e8572a', borderTopColor: 'transparent' }} />
+            )}
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ChefHat, ArrowDownAZ, Clock, Star } from 'lucide-react'
 import Layout from '../components/layout/Layout'
 import RecipeCard from '../components/recipe/RecipeCard'
@@ -21,16 +21,34 @@ const SORT_OPTIONS: { key: SortBy; label: string; Icon: typeof Clock }[] = [
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [sortBy, setSortBy] = useState<SortBy>('recent')
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
-  const { data: recipes = [], isLoading, refetch } = useRecipes(
-    undefined,
-    activeCategory === 'all' ? undefined : activeCategory,
-    sortBy,
-  )
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    refetch,
+  } = useRecipes(undefined, activeCategory === 'all' ? undefined : activeCategory, sortBy)
+
+  const recipes = data?.pages.flat() ?? []
 
   const { pullY, refreshing, threshold } = usePullToRefresh(async () => {
     await refetch()
   })
+
+  // Infinite scroll — load next page when sentinel enters viewport
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage() },
+      { rootMargin: '200px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   return (
     <Layout>
@@ -105,7 +123,6 @@ export default function Home() {
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Intenta con otra categoría</p>
           </div>
         ) : (
-          /* Onboarding empty state */
           <div className="flex flex-col items-center px-6 pt-10 pb-8 text-center gap-6">
             <div
               className="w-24 h-24 rounded-3xl flex items-center justify-center"
@@ -114,17 +131,12 @@ export default function Home() {
               <span className="text-5xl">🍳</span>
             </div>
             <div className="space-y-2">
-              <p className="text-xl font-bold recipe-title" style={{ color: 'var(--text)' }}>
-                Tu recetario está vacío
-              </p>
+              <p className="text-xl font-bold recipe-title" style={{ color: 'var(--text)' }}>Tu recetario está vacío</p>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                 Guarda tus recetas favoritas para tenerlas siempre a mano.
               </p>
             </div>
-            <div
-              className="w-full rounded-2xl p-4 space-y-3 text-left"
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-            >
+            <div className="w-full rounded-2xl p-4 space-y-3 text-left" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
               {[
                 { emoji: '📝', text: 'Toca + para añadir tu primera receta' },
                 { emoji: '📸', text: 'Agrega fotos a tus platos' },
@@ -143,6 +155,7 @@ export default function Home() {
         <div className="px-4 pt-1">
           <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>
             {recipes.length} {recipes.length === 1 ? 'receta' : 'recetas'}
+            {hasNextPage && ' · desliza para más'}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {recipes.map((recipe, i) => (
@@ -156,6 +169,13 @@ export default function Home() {
                 <RecipeCard recipe={recipe} />
               </div>
             ))}
+          </div>
+
+          {/* Sentinel + spinner */}
+          <div ref={sentinelRef} className="h-12 flex items-center justify-center mt-2">
+            {isFetchingNextPage && (
+              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#e8572a', borderTopColor: 'transparent' }} />
+            )}
           </div>
         </div>
       )}
