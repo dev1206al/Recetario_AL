@@ -2,14 +2,13 @@ import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   ArrowLeft, Edit2, Trash2, Clock, Users, ChefHat,
-  Share2, Printer, Globe, Lock, UtensilsCrossed, Home,
+  Share2, Printer, Globe, Lock, UtensilsCrossed, Home, Minus, Plus,
 } from 'lucide-react'
 import { useRecipe, useDeleteRecipe, useTogglePublic, formatMinutes } from '../hooks/useRecipes'
 import IngredientChecklist from '../components/recipe/IngredientChecklist'
 import PhotoGallery from '../components/recipe/PhotoGallery'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import DifficultyStars from '../components/ui/DifficultyStars'
-import CategoryBadge from '../components/ui/CategoryBadge'
 import { CATEGORIES } from '../types'
 import toast from 'react-hot-toast'
 
@@ -23,6 +22,7 @@ export default function RecipeDetail() {
   const togglePublic = useTogglePublic()
   const [tab, setTab] = useState<Tab>('ingredientes')
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [localServings, setLocalServings] = useState<number | null>(null)
 
   if (isLoading) {
     return (
@@ -41,6 +41,9 @@ export default function RecipeDetail() {
   }
 
   const cat = CATEGORIES[recipe.category] ?? CATEGORIES['otros']
+  const baseServings = recipe.servings ?? 4
+  const servings = localServings ?? baseServings
+  const scaleFactor = servings / baseServings
 
   const handleDelete = async () => {
     await deleteRecipe.mutateAsync(recipe.id)
@@ -124,21 +127,45 @@ export default function RecipeDetail() {
 
         {/* Title overlay */}
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-5">
-          <CategoryBadge category={recipe.category} size="sm" />
-          <h1 className="text-2xl font-bold text-white mt-2 leading-tight">{recipe.title}</h1>
+          <h1 className="text-2xl font-bold text-white leading-tight">{recipe.title}</h1>
         </div>
       </div>
 
       {/* Content */}
       <div id="recipe-content" className="pb-nav space-y-5">
 
-        {/* Meta row */}
-        <div className="px-4 pt-4 flex flex-wrap gap-x-5 gap-y-3">
+        {/* Category + Meta row */}
+        <div className="px-4 pt-4 space-y-3">
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm">{cat.emoji}</span>
+            <span className="text-xs font-semibold" style={{ color: cat.color }}>{cat.label}</span>
+          </div>
+        </div>
+        <div className="px-4 flex flex-wrap gap-x-5 gap-y-3">
           <DifficultyStars value={recipe.difficulty ?? 1} />
-          <span className="flex items-center gap-1.5 text-sm" style={{ color: 'var(--text-muted)' }}>
-            <Users size={14} />
-            {recipe.servings} {recipe.servings === 1 ? 'porción' : 'porciones'}
-          </span>
+          <div className="flex items-center gap-2">
+            <Users size={14} style={{ color: 'var(--text-muted)' }} />
+            <button
+              onClick={() => setLocalServings(s => Math.max(1, (s ?? baseServings) - 1))}
+              className="w-6 h-6 rounded-lg flex items-center justify-center"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+            >
+              <Minus size={12} style={{ color: 'var(--text)' }} />
+            </button>
+            <span className="text-sm font-semibold min-w-[1.5rem] text-center" style={{ color: 'var(--text)' }}>
+              {servings}
+            </span>
+            <button
+              onClick={() => setLocalServings(s => (s ?? baseServings) + 1)}
+              className="w-6 h-6 rounded-lg flex items-center justify-center"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+            >
+              <Plus size={12} style={{ color: 'var(--text)' }} />
+            </button>
+            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              {servings === 1 ? 'porción' : 'porciones'}
+            </span>
+          </div>
           {recipe.prep_time > 0 && (
             <span className="flex items-center gap-1.5 text-sm" style={{ color: 'var(--text-muted)' }}>
               <Clock size={14} />
@@ -227,6 +254,7 @@ export default function RecipeDetail() {
               <IngredientChecklist
                 ingredients={recipe.ingredients ?? []}
                 interactive={false}
+                scaleFactor={scaleFactor}
               />
             </div>
           )}

@@ -15,7 +15,6 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
   const minutes = totalMinutes(recipe)
   const navigate = useNavigate()
 
-  // Build sorted photo list: cover first, then by order_index
   const photos = [...(recipe.photos ?? [])].sort((a, b) => {
     if (a.is_cover && !b.is_cover) return -1
     if (!a.is_cover && b.is_cover) return 1
@@ -24,8 +23,6 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
   const hasPhotos = photos.length > 0
 
   const [current, setCurrent] = useState(0)
-
-  // Touch swipe detection
   const touchStartX = useRef<number | null>(null)
 
   const prev = (e: React.MouseEvent | React.TouchEvent) => {
@@ -47,15 +44,13 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
   const onTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return
     const diff = touchStartX.current - e.changedTouches[0].clientX
-    if (Math.abs(diff) > 40) {
-      diff > 0 ? next(e) : prev(e)
-    }
+    if (Math.abs(diff) > 40) diff > 0 ? next(e) : prev(e)
     touchStartX.current = null
   }
 
   return (
     <article className="card overflow-hidden transition-transform duration-150 active:scale-[0.98]">
-      {/* Photo / Carousel area */}
+      {/* ── Foto / Carrusel ─────────────────────────────────── */}
       <div
         className="relative h-44 overflow-hidden"
         style={{ background: 'var(--surface-2)' }}
@@ -74,23 +69,12 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
               />
             ))}
 
-            {/* Left / Right tap zones (only when multiple photos) */}
             {photos.length > 1 && (
               <>
-                <button
-                  onClick={prev}
-                  className="absolute left-0 top-0 w-1/3 h-full z-10"
-                  aria-label="Foto anterior"
-                />
-                <button
-                  onClick={next}
-                  className="absolute right-0 top-0 w-1/3 h-full z-10"
-                  aria-label="Foto siguiente"
-                />
+                <button onClick={prev} className="absolute left-0 top-0 w-1/3 h-full z-10" aria-label="Foto anterior" />
+                <button onClick={next} className="absolute right-0 top-0 w-1/3 h-full z-10" aria-label="Foto siguiente" />
               </>
             )}
-
-            {/* Tap center → navigate to detail */}
             <button
               onClick={() => navigate(`/recipes/${recipe.id}`)}
               className="absolute left-1/3 top-0 w-1/3 h-full z-10"
@@ -102,44 +86,46 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
             onClick={() => navigate(`/recipes/${recipe.id}`)}
             className="w-full h-full flex items-center justify-center"
           >
-            <span className="text-5xl opacity-40">{cat.emoji}</span>
+            <span className="text-5xl opacity-30">{cat.emoji}</span>
           </button>
         )}
 
-        {/* Category badge */}
-        <div className="absolute top-3 left-3 z-20 pointer-events-none">
-          <span
-            className="text-xs font-semibold px-2 py-1 rounded-lg"
-            style={{ background: `${cat.color}dd`, color: 'white' }}
-          >
-            {cat.emoji} {cat.label}
-          </span>
-        </div>
-
-        {/* Dot indicators */}
+        {/* Dots — solo cuando hay varias fotos */}
         {photos.length > 1 && (
-          <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-20 pointer-events-none">
-            {photos.map((_, idx) => (
-              <div
-                key={idx}
-                className="rounded-full transition-all duration-200"
-                style={{
-                  width: idx === current ? 16 : 5,
-                  height: 5,
-                  background: idx === current ? 'white' : 'rgba(255,255,255,0.5)',
-                }}
-              />
-            ))}
-          </div>
+          <>
+            <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-20 pointer-events-none">
+              {photos.map((_, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-full transition-all duration-200"
+                  style={{
+                    width: idx === current ? 16 : 5,
+                    height: 5,
+                    background: idx === current ? 'white' : 'rgba(255,255,255,0.5)',
+                  }}
+                />
+              ))}
+            </div>
+          </>
         )}
-
-        {/* Gradient */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
       </div>
 
-      {/* Info — tap to navigate */}
+      {/* ── Info ────────────────────────────────────────────── */}
       <Link to={`/recipes/${recipe.id}`} className="block">
-        <div className="p-4 space-y-3">
+        <div className="px-4 pt-3 pb-4 space-y-2">
+
+          {/* Categoría — debajo de la foto, discreta */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm">{cat.emoji}</span>
+            <span
+              className="text-xs font-semibold"
+              style={{ color: cat.color }}
+            >
+              {cat.label}
+            </span>
+          </div>
+
           <h2 className="font-semibold text-sm leading-snug line-clamp-2" style={{ color: 'var(--text)' }}>
             {recipe.title}
           </h2>

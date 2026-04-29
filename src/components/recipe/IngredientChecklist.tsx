@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { Check } from 'lucide-react'
 import type { Ingredient } from '../../types'
+import { scaleAmount } from '../../lib/scaleAmount'
 
 interface IngredientChecklistProps {
   ingredients: Ingredient[]
   interactive?: boolean
+  scaleFactor?: number
 }
 
-export default function IngredientChecklist({ ingredients, interactive = true }: IngredientChecklistProps) {
+export default function IngredientChecklist({ ingredients, interactive = true, scaleFactor = 1 }: IngredientChecklistProps) {
   const [checked, setChecked] = useState<Set<string>>(new Set())
 
   const toggle = (id: string) => {
@@ -57,7 +59,7 @@ export default function IngredientChecklist({ ingredients, interactive = true }:
                 textDecoration: isChecked ? 'line-through' : 'none',
               }}
             >
-              {ing.amount && <span className="font-semibold">{ing.amount} {ing.unit} </span>}
+              {ing.amount && <span className="font-semibold">{scaleAmount(ing.amount, scaleFactor)} {ing.unit} </span>}
               {ing.name}
             </span>
           </button>

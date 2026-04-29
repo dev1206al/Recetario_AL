@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, ChevronLeft, ChevronRight, Timer as TimerIcon, Plus, Home, Sun, Moon } from 'lucide-react'
+import { ArrowLeft, ChevronLeft, ChevronRight, Timer as TimerIcon, Plus, Home, Sun, Moon, Minus, Users } from 'lucide-react'
 import { useRecipe, formatMinutes } from '../hooks/useRecipes'
 import { useTimers } from '../hooks/useTimer'
 import { useTheme } from '../context/ThemeContext'
@@ -18,6 +18,7 @@ export default function CookMode() {
   const { timers, addTimer, toggleTimer, resetTimer, removeTimer } = useTimers()
   const [view, setView] = useState<View>('ingredients')
   const [currentStep, setCurrentStep] = useState(0)
+  const [localServings, setLocalServings] = useState<number | null>(null)
 
   if (isLoading) {
     return (
@@ -33,6 +34,9 @@ export default function CookMode() {
   const ingredients = recipe.ingredients ?? []
   const cat = CATEGORIES[recipe.category] ?? CATEGORIES['otros']
   const step = steps[currentStep]
+  const baseServings = recipe.servings ?? 4
+  const servings = localServings ?? baseServings
+  const scaleFactor = servings / baseServings
 
   return (
     <div className="min-h-dvh flex flex-col" style={{ background: 'var(--bg)' }}>
@@ -105,6 +109,31 @@ export default function CookMode() {
         </div>
       </div>
 
+      {/* Servings stepper */}
+      <div className="px-4 pt-3 flex-shrink-0 flex items-center gap-2">
+        <Users size={14} style={{ color: 'var(--text-muted)' }} />
+        <button
+          onClick={() => setLocalServings(s => Math.max(1, (s ?? baseServings) - 1))}
+          className="w-7 h-7 rounded-lg flex items-center justify-center"
+          style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+        >
+          <Minus size={13} style={{ color: 'var(--text)' }} />
+        </button>
+        <span className="text-sm font-semibold min-w-[1.5rem] text-center" style={{ color: 'var(--text)' }}>
+          {servings}
+        </span>
+        <button
+          onClick={() => setLocalServings(s => (s ?? baseServings) + 1)}
+          className="w-7 h-7 rounded-lg flex items-center justify-center"
+          style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+        >
+          <Plus size={13} style={{ color: 'var(--text)' }} />
+        </button>
+        <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+          {servings === 1 ? 'porción' : 'porciones'}
+        </span>
+      </div>
+
       {/* Timers (always visible) */}
       {timers.length > 0 && (
         <div className="px-4 pt-4 flex-shrink-0">
@@ -121,7 +150,7 @@ export default function CookMode() {
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8">
         {view === 'ingredients' && (
           <div className="card p-2">
-            <IngredientChecklist ingredients={ingredients} interactive />
+            <IngredientChecklist ingredients={ingredients} interactive scaleFactor={scaleFactor} />
           </div>
         )}
 

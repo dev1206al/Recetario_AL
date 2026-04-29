@@ -457,9 +457,31 @@ export default function RecipeForm() {
                   />
                   <input
                     {...register(`ingredients.${idx}.unit`)}
+                    list="unit-options"
                     className="input-base"
-                    placeholder="Unidad (ej. g, ml, taza)"
+                    placeholder="Unidad"
+                    autoComplete="off"
                   />
+                  <datalist id="unit-options">
+                    <option value="g" />
+                    <option value="kg" />
+                    <option value="ml" />
+                    <option value="L" />
+                    <option value="taza(s)" />
+                    <option value="cucharada(s)" />
+                    <option value="cucharadita(s)" />
+                    <option value="pizca" />
+                    <option value="pz" />
+                    <option value="oz" />
+                    <option value="lb" />
+                    <option value="sobre(s)" />
+                    <option value="rebanada(s)" />
+                    <option value="diente(s)" />
+                    <option value="rama(s)" />
+                    <option value="hoja(s)" />
+                    <option value="al gusto" />
+                    <option value="paquete(s)" />
+                  </datalist>
                 </div>
               </div>
             ))}
