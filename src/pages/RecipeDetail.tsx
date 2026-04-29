@@ -41,6 +41,10 @@ export default function RecipeDetail() {
   }
 
   const cat = CATEGORIES[recipe.category] ?? CATEGORIES['otros']
+  const coverUrl = recipe.cover_url
+    ?? recipe.photos?.find(p => p.is_cover)?.url
+    ?? recipe.photos?.[0]?.url
+    ?? null
   const baseServings = recipe.servings ?? 4
   const servings = localServings ?? baseServings
   const scaleFactor = servings / baseServings
@@ -73,74 +77,78 @@ export default function RecipeDetail() {
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--bg)' }}>
-      {/* Hero */}
-      <div className="relative h-72 overflow-hidden" style={{ background: 'var(--surface-2)' }}>
-        {recipe.cover_url ? (
-          <img src={recipe.cover_url} alt={recipe.title} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-8xl opacity-30">{cat.emoji}</span>
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30" />
 
-        {/* Nav bar — safe-area-inset-top para modo standalone */}
-        <div
-          className="absolute top-0 left-0 right-0 flex items-center justify-between px-4"
-          style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}
-        >
+      {/* ── Barra de navegación compacta ────────────────────── */}
+      <div
+        className="sticky top-0 z-40 no-print"
+        style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}
+      >
+        <div aria-hidden style={{ height: 'env(safe-area-inset-top)' }} />
+        <div className="mx-auto max-w-5xl flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(-1)}
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-black/40 backdrop-blur-sm"
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
             >
-              <ArrowLeft size={20} className="text-white" />
+              <ArrowLeft size={20} style={{ color: 'var(--text)' }} />
             </button>
             <Link
               to="/"
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-black/40 backdrop-blur-sm no-print"
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
             >
-              <Home size={18} className="text-white" />
+              <Home size={18} style={{ color: 'var(--text-muted)' }} />
             </Link>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-black/40 backdrop-blur-sm no-print"
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
             >
-              <Printer size={18} className="text-white" />
+              <Printer size={18} style={{ color: 'var(--text-muted)' }} />
             </button>
             <button
               onClick={handleShare}
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-black/40 backdrop-blur-sm no-print"
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
             >
-              <Share2 size={18} className="text-white" />
+              <Share2 size={18} style={{ color: 'var(--text-muted)' }} />
             </button>
             <Link
               to={`/recipes/${recipe.id}/edit`}
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-black/40 backdrop-blur-sm no-print"
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
             >
-              <Edit2 size={18} className="text-white" />
+              <Edit2 size={18} style={{ color: 'var(--text-muted)' }} />
             </Link>
           </div>
         </div>
-
-        {/* Title overlay */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-5">
-          <h1 className="text-2xl font-bold text-white leading-tight">{recipe.title}</h1>
-        </div>
       </div>
 
-      {/* Content */}
-      <div id="recipe-content" className="pb-nav space-y-5">
+      {/* ── Foto de portada (solo si existe) ────────────────── */}
+      {coverUrl && (
+        <div className="mx-auto max-w-5xl px-0 md:px-8 md:pt-5">
+          <div className="relative h-52 md:h-72 overflow-hidden md:rounded-2xl">
+            <img src={coverUrl} alt={recipe.title} className="w-full h-full object-cover" />
+          </div>
+        </div>
+      )}
 
-        {/* Category + Meta row */}
-        <div className="px-4 pt-4 space-y-3">
+      {/* Content */}
+      <div id="recipe-content" className="mx-auto max-w-5xl pb-nav space-y-5">
+
+        {/* Título + Categoría */}
+        <div className="px-4 pt-4 space-y-1">
           <div className="flex items-center gap-1.5">
             <span className="text-sm">{cat.emoji}</span>
             <span className="text-xs font-semibold" style={{ color: cat.color }}>{cat.label}</span>
           </div>
+          <h1 className="text-xl font-bold leading-tight" style={{ color: 'var(--text)' }}>{recipe.title}</h1>
         </div>
+
+        {/* Meta row */}
         <div className="px-4 flex flex-wrap gap-x-5 gap-y-3">
           <DifficultyStars value={recipe.difficulty ?? 1} />
           <div className="flex items-center gap-2">
