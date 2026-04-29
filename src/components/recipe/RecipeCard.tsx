@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Clock, Users, UtensilsCrossed, Edit2, Share2, X } from 'lucide-react'
+import { Clock, Users, UtensilsCrossed, Edit2, Share2 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Recipe } from '../../types'
 import { CATEGORIES } from '../../types'
@@ -25,21 +25,17 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
     return a.order_index - b.order_index
   })
   const hasPhotos = photos.length > 0
-
   const [current, setCurrent] = useState(0)
   const touchStartX = useRef<number | null>(null)
 
   const longPress = useLongPress(() => setShowMenu(true))
 
   const prev = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault(); e.stopPropagation()
     setCurrent(i => (i === 0 ? photos.length - 1 : i - 1))
   }
-
   const next = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault(); e.stopPropagation()
     setCurrent(i => (i === photos.length - 1 ? 0 : i + 1))
   }
 
@@ -47,11 +43,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
     touchStartX.current = e.touches[0].clientX
     longPress.onTouchStart(e)
   }
-
-  const onSwipeTouchMove = (e: React.TouchEvent) => {
-    longPress.onTouchMove(e)
-  }
-
+  const onSwipeTouchMove = (e: React.TouchEvent) => { longPress.onTouchMove(e) }
   const onSwipeTouchEnd = (e: React.TouchEvent) => {
     longPress.onTouchEnd()
     if (touchStartX.current === null) return
@@ -64,26 +56,15 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
 
   const handleShare = async () => {
     setShowMenu(false)
-    if (!recipe.is_public) {
-      await togglePublic.mutateAsync({ id: recipe.id, isPublic: true })
-    }
+    if (!recipe.is_public) await togglePublic.mutateAsync({ id: recipe.id, isPublic: true })
     const url = `${window.location.origin}/r/${recipe.id}`
-    try {
-      await navigator.share({ title: recipe.title, url })
-      toastShared()
-    } catch {
-      await navigator.clipboard.writeText(url)
-      toastCopied()
-    }
+    try { await navigator.share({ title: recipe.title, url }); toastShared() }
+    catch { await navigator.clipboard.writeText(url); toastCopied() }
   }
 
   return (
     <>
-      <article
-        className="card overflow-hidden transition-all duration-200 active:scale-[0.98]"
-        onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)', e.currentTarget.style.transform = 'translateY(-2px)')}
-        onMouseLeave={e => (e.currentTarget.style.boxShadow = '', e.currentTarget.style.transform = '')}
-      >
+      <article className="card overflow-hidden">
         {/* ── Foto / Carrusel ─────────────────────────────────── */}
         <div
           className="relative overflow-hidden"
@@ -103,7 +84,6 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
                   style={{ opacity: idx === current ? 1 : 0 }}
                 />
               ))}
-
               {photos.length > 1 && (
                 <>
                   <button onClick={prev} className="absolute left-0 top-0 w-1/3 h-full z-10" aria-label="Foto anterior" />
@@ -129,7 +109,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
             </button>
           )}
 
-          {/* Badge de categoría */}
+          {/* Badge categoría */}
           <div
             className="absolute top-2 left-2 z-20 pointer-events-none flex items-center gap-1 px-2 py-1 rounded-lg backdrop-blur-sm"
             style={{ background: cat.color + 'cc' }}
@@ -146,11 +126,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
                   <div
                     key={idx}
                     className="rounded-full transition-all duration-200"
-                    style={{
-                      width: idx === current ? 16 : 5,
-                      height: 5,
-                      background: idx === current ? 'white' : 'rgba(255,255,255,0.5)',
-                    }}
+                    style={{ width: idx === current ? 16 : 5, height: 5, background: idx === current ? 'white' : 'rgba(255,255,255,0.5)' }}
                   />
                 ))}
               </div>
@@ -188,11 +164,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
             {recipe.tags && recipe.tags.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {recipe.tags.slice(0, 3).map(tag => (
-                  <span
-                    key={tag}
-                    className="text-xs px-2 py-0.5 rounded-md"
-                    style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}
-                  >
+                  <span key={tag} className="text-xs px-2 py-0.5 rounded-md" style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}>
                     {tag}
                   </span>
                 ))}
@@ -202,70 +174,63 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
         </Link>
       </article>
 
-      {/* Quick actions menu (long press) */}
+      {/* ── Quick actions (long press) ───────────────────────── */}
       {showMenu && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center p-4" onClick={() => setShowMenu(false)}>
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center"
+          onClick={() => setShowMenu(false)}
+        >
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
           <div
-            className="relative w-full max-w-sm rounded-2xl overflow-hidden"
-            style={{ background: 'var(--surface)', animation: 'slideUp 220ms cubic-bezier(0.34,1.56,0.64,1)' }}
+            className="relative w-full max-w-sm mx-4 mb-4 rounded-2xl overflow-hidden"
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              animation: 'slideUp 200ms ease',
+            }}
             onClick={e => e.stopPropagation()}
           >
-            {/* Recipe preview header */}
-            <div
-              className="px-5 py-4 flex items-center gap-3"
-              style={{ borderBottom: '1px solid var(--border)' }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                style={{ background: cat.color + '22' }}
-              >
-                {cat.emoji}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="recipe-title text-sm font-semibold leading-snug line-clamp-1" style={{ color: 'var(--text)' }}>
-                  {recipe.title}
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{cat.label}</p>
-              </div>
-              <button
-                onClick={() => setShowMenu(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: 'var(--surface-2)' }}
-              >
-                <X size={14} style={{ color: 'var(--text-muted)' }} />
-              </button>
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-8 h-1 rounded-full" style={{ background: 'var(--border)' }} />
             </div>
 
+            {/* Title */}
+            <p className="recipe-title text-sm font-semibold px-5 pt-1 pb-4 line-clamp-1" style={{ color: 'var(--text)' }}>
+              {recipe.title}
+            </p>
+
+            {/* Divider */}
+            <div style={{ height: 1, background: 'var(--border)' }} />
+
             {/* Actions */}
-            <div className="p-3 space-y-1.5">
+            <div className="p-2">
               <button
                 onClick={() => { setShowMenu(false); navigate(`/recipes/${recipe.id}/cook`) }}
-                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-white"
-                style={{ background: '#e8572a' }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium"
+                style={{ color: 'var(--text)' }}
               >
-                <UtensilsCrossed size={18} />
+                <UtensilsCrossed size={16} style={{ color: '#e8572a' }} />
                 Modo Cocinar
               </button>
               <button
                 onClick={() => { setShowMenu(false); navigate(`/recipes/${recipe.id}/edit`) }}
                 className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium"
-                style={{ background: 'var(--surface-2)', color: 'var(--text)' }}
+                style={{ color: 'var(--text)' }}
               >
                 <Edit2 size={16} style={{ color: 'var(--text-muted)' }} />
-                Editar receta
+                Editar
               </button>
               <button
                 onClick={handleShare}
                 className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium"
-                style={{ background: 'var(--surface-2)', color: 'var(--text)' }}
+                style={{ color: 'var(--text)' }}
               >
                 <Share2 size={16} style={{ color: 'var(--text-muted)' }} />
                 Compartir
               </button>
             </div>
 
-            {/* Safe area padding */}
             <div style={{ height: 'env(safe-area-inset-bottom)' }} />
           </div>
         </div>

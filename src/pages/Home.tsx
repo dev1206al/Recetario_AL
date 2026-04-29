@@ -1,5 +1,5 @@
-import { useState, useDeferredValue } from 'react'
-import { Search, X, ChefHat, ArrowDownAZ, Clock, Star } from 'lucide-react'
+import { useState } from 'react'
+import { ChefHat, ArrowDownAZ, Clock, Star } from 'lucide-react'
 import Layout from '../components/layout/Layout'
 import RecipeCard from '../components/recipe/RecipeCard'
 import SkeletonCard from '../components/recipe/SkeletonCard'
@@ -19,13 +19,11 @@ const SORT_OPTIONS: { key: SortBy; label: string; Icon: typeof Clock }[] = [
 ]
 
 export default function Home() {
-  const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [sortBy, setSortBy] = useState<SortBy>('recent')
-  const deferredSearch = useDeferredValue(search)
 
   const { data: recipes = [], isLoading, refetch } = useRecipes(
-    deferredSearch || undefined,
+    undefined,
     activeCategory === 'all' ? undefined : activeCategory,
     sortBy,
   )
@@ -52,31 +50,6 @@ export default function Home() {
       </div>
 
       <div className="px-4 pt-4 pb-2 space-y-3">
-        {/* Search */}
-        <div className="relative">
-          <Search
-            size={16}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2"
-            style={{ color: 'var(--text-muted)' }}
-          />
-          <input
-            type="search"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar recetas, ingredientes..."
-            className="input-base pl-10 pr-10"
-          />
-          {search && (
-            <button
-              onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-
         {/* Category filter */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-0.5">
           {ALL_CATEGORIES.map(cat => (
@@ -125,11 +98,11 @@ export default function Home() {
           {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : recipes.length === 0 ? (
-        search || activeCategory !== 'all' ? (
+        activeCategory !== 'all' ? (
           <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
             <ChefHat size={48} style={{ color: 'var(--border)' }} />
             <p className="mt-4 font-semibold" style={{ color: 'var(--text)' }}>Sin resultados</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Intenta con otros filtros</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Intenta con otra categoría</p>
           </div>
         ) : (
           /* Onboarding empty state */
