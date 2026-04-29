@@ -85,10 +85,22 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           <button
             onClick={() => navigate(`/recipes/${recipe.id}`)}
             className="w-full h-full flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${cat.color}33 0%, ${cat.color}11 100%)`,
+            }}
           >
-            <span className="text-5xl opacity-30">{cat.emoji}</span>
+            <span className="text-5xl opacity-40">{cat.emoji}</span>
           </button>
         )}
+
+        {/* Badge de categoría — esquina superior izquierda */}
+        <div
+          className="absolute top-2 left-2 z-20 pointer-events-none flex items-center gap-1 px-2 py-1 rounded-lg backdrop-blur-sm"
+          style={{ background: cat.color + 'cc' }}
+        >
+          <span className="text-xs leading-none">{cat.emoji}</span>
+          <span className="text-xs font-semibold leading-none text-white">{cat.label}</span>
+        </div>
 
         {/* Dots — solo cuando hay varias fotos */}
         {photos.length > 1 && (
@@ -114,17 +126,6 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
       {/* ── Info ────────────────────────────────────────────── */}
       <Link to={`/recipes/${recipe.id}`} className="block">
         <div className="px-4 pt-3 pb-4 space-y-2">
-
-          {/* Categoría — debajo de la foto, discreta */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm">{cat.emoji}</span>
-            <span
-              className="text-xs font-semibold"
-              style={{ color: cat.color }}
-            >
-              {cat.label}
-            </span>
-          </div>
 
           <h2 className="font-semibold text-sm leading-snug line-clamp-2" style={{ color: 'var(--text)' }}>
             {recipe.title}

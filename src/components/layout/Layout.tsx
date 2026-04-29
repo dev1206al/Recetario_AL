@@ -13,7 +13,7 @@ export default function Layout({ children, headerTitle, headerRight, hideBottomN
   return (
     <div className="flex flex-col min-h-dvh" style={{ background: 'var(--bg)' }}>
       <Header title={headerTitle} right={headerRight} />
-      <main className={hideBottomNav ? 'flex-1' : 'flex-1 pb-nav'}>
+      <main className={`mx-auto w-full max-w-5xl ${hideBottomNav ? 'flex-1' : 'flex-1 pb-nav'}`}>
         {children}
       </main>
       {!hideBottomNav && <BottomNav />}
