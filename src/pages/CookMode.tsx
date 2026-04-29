@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, ChevronLeft, ChevronRight, Timer as TimerIcon, Plus, Home, Sun, Moon, Minus, Users } from 'lucide-react'
 import { useRecipe, formatMinutes } from '../hooks/useRecipes'
@@ -19,6 +19,13 @@ export default function CookMode() {
   const [view, setView] = useState<View>('ingredients')
   const [currentStep, setCurrentStep] = useState(0)
   const [localServings, setLocalServings] = useState<number | null>(null)
+  const wakeLock = useRef<WakeLockSentinel | null>(null)
+
+  useEffect(() => {
+    if (!('wakeLock' in navigator)) return
+    navigator.wakeLock.request('screen').then(lock => { wakeLock.current = lock })
+    return () => { wakeLock.current?.release() }
+  }, [])
 
   if (isLoading) {
     return (
@@ -46,7 +53,7 @@ export default function CookMode() {
         style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}
       >
         <div aria-hidden style={{ height: 'env(safe-area-inset-top)' }} />
-        <div className="flex items-center justify-between px-4 h-14">
+        <div className="mx-auto max-w-5xl flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-2">
           <button
             onClick={() => navigate(-1)}
@@ -87,7 +94,7 @@ export default function CookMode() {
       </div>
 
       {/* Tab switch */}
-      <div className="px-4 pt-4 flex-shrink-0">
+      <div className="mx-auto w-full max-w-5xl px-4 pt-4 flex-shrink-0">
         <div
           className="flex rounded-xl overflow-hidden"
           style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
@@ -110,7 +117,7 @@ export default function CookMode() {
       </div>
 
       {/* Servings stepper */}
-      <div className="px-4 pt-3 flex-shrink-0 flex items-center gap-2">
+      <div className="mx-auto w-full max-w-5xl px-4 pt-3 flex-shrink-0 flex items-center gap-2">
         <Users size={14} style={{ color: 'var(--text-muted)' }} />
         <button
           onClick={() => setLocalServings(s => Math.max(1, (s ?? baseServings) - 1))}
@@ -136,7 +143,7 @@ export default function CookMode() {
 
       {/* Timers (always visible) */}
       {timers.length > 0 && (
-        <div className="px-4 pt-4 flex-shrink-0">
+        <div className="mx-auto w-full max-w-5xl px-4 pt-4 flex-shrink-0">
           <TimerPanel
             timers={timers}
             onToggle={toggleTimer}
@@ -147,7 +154,8 @@ export default function CookMode() {
       )}
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8">
+      <div className="flex-1 overflow-y-auto">
+      <div className="mx-auto max-w-5xl px-4 pt-4 pb-8">
         {view === 'ingredients' && (
           <div className="card p-2">
             <IngredientChecklist ingredients={ingredients} interactive scaleFactor={scaleFactor} />
@@ -278,6 +286,7 @@ export default function CookMode() {
             )}
           </div>
         )}
+      </div>
       </div>
     </div>
   )
