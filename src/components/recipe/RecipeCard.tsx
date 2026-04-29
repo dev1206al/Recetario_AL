@@ -142,34 +142,23 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           onTouchMove={longPress.onTouchMove}
           onTouchEnd={longPress.onTouchEnd}
         >
-          <div className="px-4 pt-3 pb-4 space-y-2">
-            <h2 className="recipe-title text-sm leading-snug line-clamp-2" style={{ color: 'var(--text)' }}>
+          <div className="px-3 pt-3 pb-3 flex flex-col gap-1.5" style={{ height: 76 }}>
+            <h2 className="recipe-title text-sm leading-snug line-clamp-1 flex-shrink-0" style={{ color: 'var(--text)' }}>
               {recipe.title}
             </h2>
-            <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-              <DifficultyStars value={recipe.difficulty ?? 1} size={12} />
-              <div className="flex items-center gap-3">
-                {minutes > 0 && (
-                  <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
-                    <Clock size={11} />
-                    {formatMinutes(minutes)}
-                  </span>
-                )}
+            <DifficultyStars value={recipe.difficulty ?? 1} size={12} />
+            <div className="flex items-center gap-3">
+              {minutes > 0 && (
                 <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
-                  <Users size={11} />
-                  {recipe.servings ?? 4}
+                  <Clock size={11} />
+                  {formatMinutes(minutes)}
                 </span>
-              </div>
+              )}
+              <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
+                <Users size={11} />
+                {recipe.servings ?? 4}
+              </span>
             </div>
-            {recipe.tags && recipe.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {recipe.tags.slice(0, 3).map(tag => (
-                  <span key={tag} className="text-xs px-2 py-0.5 rounded-md" style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
         </Link>
       </article>
