@@ -212,6 +212,11 @@ export async function deletePhotoRecord(id: string, storagePath: string): Promis
   if (error) throw error
 }
 
+export async function updateCoverUrl(recipeId: string, url: string | null): Promise<void> {
+  const { error } = await supabase.from('recipes').update({ cover_url: url }).eq('id', recipeId)
+  if (error) throw error
+}
+
 // ── Toggle public ─────────────────────────────────────────────
 export function useTogglePublic() {
   const queryClient = useQueryClient()

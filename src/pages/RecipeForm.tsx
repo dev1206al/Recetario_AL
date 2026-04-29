@@ -7,7 +7,7 @@ import {
   ArrowLeft, Plus, Trash2, GripVertical, ChevronUp, ChevronDown, Timer, Home, Camera, X, Star,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useRecipe, useSaveRecipe, uploadPhoto, savePhotoRecord, deletePhotoRecord } from '../hooks/useRecipes'
+import { useRecipe, useSaveRecipe, uploadPhoto, savePhotoRecord, deletePhotoRecord, updateCoverUrl } from '../hooks/useRecipes'
 import { useAuth } from '../context/AuthContext'
 import { CATEGORIES, type Category, type RecipePhoto } from '../types'
 import TagInput from '../components/ui/TagInput'
@@ -131,13 +131,26 @@ export default function RecipeForm() {
       })
 
       // Upload any pending photo files
+      let newCoverUrl: string | null = null
       if (photoFiles.length > 0) {
         const baseIndex = existingPhotos.length
         for (let i = 0; i < photoFiles.length; i++) {
           const { path, url } = await uploadPhoto(photoFiles[i], user.id, savedId)
           const isCover = baseIndex === 0 && i === coverIdx
           await savePhotoRecord(savedId, path, url, isCover, baseIndex + i)
+          if (isCover) newCoverUrl = url
         }
+      }
+
+      // Sync cover_url on the recipe row
+      if (newCoverUrl) {
+        await updateCoverUrl(savedId, newCoverUrl)
+      } else if (!isEdit && existingPhotos.length === 0 && photoFiles.length === 0) {
+        // no photos at all — clear cover_url
+      } else if (existingPhotos.length > 0 && photoFiles.length === 0) {
+        // existing photos unchanged — ensure cover_url matches the cover photo
+        const cover = existingPhotos.find(p => p.is_cover) ?? existingPhotos[0]
+        await updateCoverUrl(savedId, cover.url)
       }
 
       toast.success(isEdit ? 'Receta actualizada' : 'Receta creada')
@@ -403,6 +416,26 @@ export default function RecipeForm() {
         {/* ─── INGREDIENTS ──────────────────────────────────── */}
         {currentSection === 'ingredients' && (
           <div className="space-y-3">
+            <datalist id="unit-options">
+              <option value="g" />
+              <option value="kg" />
+              <option value="ml" />
+              <option value="L" />
+              <option value="taza(s)" />
+              <option value="cucharada(s)" />
+              <option value="cucharadita(s)" />
+              <option value="pizca" />
+              <option value="pz" />
+              <option value="oz" />
+              <option value="lb" />
+              <option value="sobre(s)" />
+              <option value="rebanada(s)" />
+              <option value="diente(s)" />
+              <option value="rama(s)" />
+              <option value="hoja(s)" />
+              <option value="al gusto" />
+              <option value="paquete(s)" />
+            </datalist>
             {ingredientFields.map((field, idx) => (
               <div key={field.id} className="card p-3 space-y-2">
                 <div className="flex items-center gap-2">
@@ -462,26 +495,6 @@ export default function RecipeForm() {
                     placeholder="Unidad"
                     autoComplete="off"
                   />
-                  <datalist id="unit-options">
-                    <option value="g" />
-                    <option value="kg" />
-                    <option value="ml" />
-                    <option value="L" />
-                    <option value="taza(s)" />
-                    <option value="cucharada(s)" />
-                    <option value="cucharadita(s)" />
-                    <option value="pizca" />
-                    <option value="pz" />
-                    <option value="oz" />
-                    <option value="lb" />
-                    <option value="sobre(s)" />
-                    <option value="rebanada(s)" />
-                    <option value="diente(s)" />
-                    <option value="rama(s)" />
-                    <option value="hoja(s)" />
-                    <option value="al gusto" />
-                    <option value="paquete(s)" />
-                  </datalist>
                 </div>
               </div>
             ))}
