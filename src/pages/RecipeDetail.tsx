@@ -11,7 +11,7 @@ import ConfirmDialog from '../components/ui/ConfirmDialog'
 import DifficultyStars from '../components/ui/DifficultyStars'
 import SlidingTabs from '../components/ui/SlidingTabs'
 import { CATEGORIES } from '../types'
-import toast from 'react-hot-toast'
+import { toastCopied, toastShared } from '../lib/toasts'
 
 type Tab = 'ingredientes' | 'pasos' | 'notas'
 
@@ -62,9 +62,10 @@ export default function RecipeDetail() {
     const url = `${window.location.origin}/r/${recipe.id}`
     try {
       await navigator.share({ title: recipe.title, url })
+      toastShared()
     } catch {
       await navigator.clipboard.writeText(url)
-      toast.success('Link copiado al portapapeles')
+      toastCopied()
     }
   }
 
@@ -143,7 +144,7 @@ export default function RecipeDetail() {
       )}
 
       {/* Content */}
-      <div id="recipe-content" className="mx-auto max-w-5xl pb-nav space-y-5">
+      <div id="recipe-content" className="mx-auto max-w-5xl pb-thumb space-y-5">
 
         {/* Título + Categoría */}
         <div className="px-4 pt-4 space-y-1">
@@ -227,17 +228,6 @@ export default function RecipeDetail() {
           <PhotoGallery photos={recipe.photos} />
         )}
 
-        {/* Cook mode button */}
-        <div className="px-4">
-          <Link
-            to={`/recipes/${recipe.id}/cook`}
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-semibold text-white text-sm"
-            style={{ background: '#e8572a' }}
-          >
-            <UtensilsCrossed size={18} />
-            Modo Cocinar
-          </Link>
-        </div>
 
         {/* Tabs */}
         <div className="px-4">
@@ -332,6 +322,39 @@ export default function RecipeDetail() {
             Eliminar
           </button>
         </div>
+      </div>
+
+      {/* Thumb-zone sticky action bar */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-30 px-4 pt-3 no-print md:hidden"
+        style={{
+          background: 'var(--surface)',
+          borderTop: '1px solid var(--border)',
+          paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+        }}
+      >
+        <Link
+          to={`/recipes/${recipe.id}/cook`}
+          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-semibold text-white text-sm"
+          style={{ background: '#e8572a' }}
+        >
+          <UtensilsCrossed size={18} />
+          Modo Cocinar
+        </Link>
+      </div>
+
+      {/* Cook mode button (print / desktop fallback) */}
+      <div className="hidden md:block px-4">
+        <Link
+          to={`/recipes/${recipe.id}/cook`}
+          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-semibold text-white text-sm"
+          style={{ background: '#e8572a' }}
+        >
+          <UtensilsCrossed size={18} />
+          Modo Cocinar
+        </Link>
       </div>
 
       <ConfirmDialog

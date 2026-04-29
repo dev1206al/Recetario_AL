@@ -1,10 +1,12 @@
 import { useState, useRef } from 'react'
-import { Clock, Users } from 'lucide-react'
+import { Clock, Users, UtensilsCrossed, Edit2, Share2, X } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Recipe } from '../../types'
 import { CATEGORIES } from '../../types'
-import { formatMinutes, totalMinutes } from '../../hooks/useRecipes'
+import { formatMinutes, totalMinutes, useTogglePublic } from '../../hooks/useRecipes'
 import DifficultyStars from '../ui/DifficultyStars'
+import { useLongPress } from '../../hooks/useLongPress'
+import { toastCopied, toastShared } from '../../lib/toasts'
 
 interface RecipeCardProps {
   recipe: Recipe
@@ -14,6 +16,8 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
   const cat = CATEGORIES[recipe.category] ?? CATEGORIES['otros']
   const minutes = totalMinutes(recipe)
   const navigate = useNavigate()
+  const togglePublic = useTogglePublic()
+  const [showMenu, setShowMenu] = useState(false)
 
   const photos = [...(recipe.photos ?? [])].sort((a, b) => {
     if (a.is_cover && !b.is_cover) return -1
@@ -24,6 +28,8 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
 
   const [current, setCurrent] = useState(0)
   const touchStartX = useRef<number | null>(null)
+
+  const longPress = useLongPress(() => setShowMenu(true))
 
   const prev = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault()
@@ -37,136 +43,233 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
     setCurrent(i => (i === photos.length - 1 ? 0 : i + 1))
   }
 
-  const onTouchStart = (e: React.TouchEvent) => {
+  const onSwipeTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX
+    longPress.onTouchStart(e)
   }
 
-  const onTouchEnd = (e: React.TouchEvent) => {
+  const onSwipeTouchMove = (e: React.TouchEvent) => {
+    longPress.onTouchMove(e)
+  }
+
+  const onSwipeTouchEnd = (e: React.TouchEvent) => {
+    longPress.onTouchEnd()
     if (touchStartX.current === null) return
-    const diff = touchStartX.current - e.changedTouches[0].clientX
-    if (Math.abs(diff) > 40) diff > 0 ? next(e) : prev(e)
+    if (!longPress.didFire()) {
+      const diff = touchStartX.current - e.changedTouches[0].clientX
+      if (Math.abs(diff) > 40) diff > 0 ? next(e) : prev(e)
+    }
     touchStartX.current = null
   }
 
+  const handleShare = async () => {
+    setShowMenu(false)
+    if (!recipe.is_public) {
+      await togglePublic.mutateAsync({ id: recipe.id, isPublic: true })
+    }
+    const url = `${window.location.origin}/r/${recipe.id}`
+    try {
+      await navigator.share({ title: recipe.title, url })
+      toastShared()
+    } catch {
+      await navigator.clipboard.writeText(url)
+      toastCopied()
+    }
+  }
+
   return (
-    <article
-      className="card overflow-hidden transition-all duration-200 active:scale-[0.98]"
-      style={{ ['--hover-shadow' as string]: 'var(--card-shadow-hover)' }}
-      onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)', e.currentTarget.style.transform = 'translateY(-2px)')}
-      onMouseLeave={e => (e.currentTarget.style.boxShadow = '', e.currentTarget.style.transform = '')}
-    >
-      {/* ── Foto / Carrusel ─────────────────────────────────── */}
-      <div
-        className="relative overflow-hidden"
-        style={{ aspectRatio: '4/3', background: 'var(--surface-2)' }}
-        onTouchStart={hasPhotos && photos.length > 1 ? onTouchStart : undefined}
-        onTouchEnd={hasPhotos && photos.length > 1 ? onTouchEnd : undefined}
+    <>
+      <article
+        className="card overflow-hidden transition-all duration-200 active:scale-[0.98]"
+        onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)', e.currentTarget.style.transform = 'translateY(-2px)')}
+        onMouseLeave={e => (e.currentTarget.style.boxShadow = '', e.currentTarget.style.transform = '')}
       >
-        {hasPhotos ? (
-          <>
-            {photos.map((photo, idx) => (
-              <img
-                key={photo.id}
-                src={photo.url}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-                style={{ opacity: idx === current ? 1 : 0 }}
-              />
-            ))}
-
-            {photos.length > 1 && (
-              <>
-                <button onClick={prev} className="absolute left-0 top-0 w-1/3 h-full z-10" aria-label="Foto anterior" />
-                <button onClick={next} className="absolute right-0 top-0 w-1/3 h-full z-10" aria-label="Foto siguiente" />
-              </>
-            )}
-            <button
-              onClick={() => navigate(`/recipes/${recipe.id}`)}
-              className="absolute left-1/3 top-0 w-1/3 h-full z-10"
-              aria-label="Ver receta"
-            />
-          </>
-        ) : (
-          <button
-            onClick={() => navigate(`/recipes/${recipe.id}`)}
-            className="w-full h-full flex items-center justify-center"
-            style={{
-              background: `linear-gradient(135deg, ${cat.color}33 0%, ${cat.color}11 100%)`,
-            }}
-          >
-            <span className="text-5xl opacity-40">{cat.emoji}</span>
-          </button>
-        )}
-
-        {/* Badge de categoría — esquina superior izquierda */}
+        {/* ── Foto / Carrusel ─────────────────────────────────── */}
         <div
-          className="absolute top-2 left-2 z-20 pointer-events-none flex items-center gap-1 px-2 py-1 rounded-lg backdrop-blur-sm"
-          style={{ background: cat.color + 'cc' }}
+          className="relative overflow-hidden"
+          style={{ aspectRatio: '4/3', background: 'var(--surface-2)' }}
+          onTouchStart={hasPhotos && photos.length > 1 ? onSwipeTouchStart : longPress.onTouchStart}
+          onTouchMove={hasPhotos && photos.length > 1 ? onSwipeTouchMove : longPress.onTouchMove}
+          onTouchEnd={hasPhotos && photos.length > 1 ? onSwipeTouchEnd : longPress.onTouchEnd}
         >
-          <span className="text-xs leading-none">{cat.emoji}</span>
-          <span className="text-xs font-semibold leading-none text-white">{cat.label}</span>
-        </div>
-
-        {/* Dots — solo cuando hay varias fotos */}
-        {photos.length > 1 && (
-          <>
-            <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
-            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-20 pointer-events-none">
-              {photos.map((_, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-full transition-all duration-200"
-                  style={{
-                    width: idx === current ? 16 : 5,
-                    height: 5,
-                    background: idx === current ? 'white' : 'rgba(255,255,255,0.5)',
-                  }}
+          {hasPhotos ? (
+            <>
+              {photos.map((photo, idx) => (
+                <img
+                  key={photo.id}
+                  src={photo.url}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                  style={{ opacity: idx === current ? 1 : 0 }}
                 />
               ))}
-            </div>
-          </>
-        )}
-      </div>
 
-      {/* ── Info ────────────────────────────────────────────── */}
-      <Link to={`/recipes/${recipe.id}`} className="block">
-        <div className="px-4 pt-3 pb-4 space-y-2">
-
-          <h2 className="recipe-title text-sm leading-snug line-clamp-2" style={{ color: 'var(--text)' }}>
-            {recipe.title}
-          </h2>
-
-          <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-            <DifficultyStars value={recipe.difficulty ?? 1} size={12} />
-            <div className="flex items-center gap-3">
-              {minutes > 0 && (
-                <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
-                  <Clock size={11} />
-                  {formatMinutes(minutes)}
-                </span>
+              {photos.length > 1 && (
+                <>
+                  <button onClick={prev} className="absolute left-0 top-0 w-1/3 h-full z-10" aria-label="Foto anterior" />
+                  <button onClick={next} className="absolute right-0 top-0 w-1/3 h-full z-10" aria-label="Foto siguiente" />
+                </>
               )}
-              <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
-                <Users size={11} />
-                {recipe.servings ?? 4}
-              </span>
-            </div>
+              <button
+                onClick={() => navigate(`/recipes/${recipe.id}`)}
+                className="absolute left-1/3 top-0 w-1/3 h-full z-10"
+                aria-label="Ver receta"
+              />
+            </>
+          ) : (
+            <button
+              onClick={() => navigate(`/recipes/${recipe.id}`)}
+              className="w-full h-full flex items-center justify-center"
+              onTouchStart={longPress.onTouchStart}
+              onTouchMove={longPress.onTouchMove}
+              onTouchEnd={longPress.onTouchEnd}
+              style={{ background: `linear-gradient(135deg, ${cat.color}33 0%, ${cat.color}11 100%)` }}
+            >
+              <span className="text-5xl opacity-40">{cat.emoji}</span>
+            </button>
+          )}
+
+          {/* Badge de categoría */}
+          <div
+            className="absolute top-2 left-2 z-20 pointer-events-none flex items-center gap-1 px-2 py-1 rounded-lg backdrop-blur-sm"
+            style={{ background: cat.color + 'cc' }}
+          >
+            <span className="text-xs leading-none">{cat.emoji}</span>
+            <span className="text-xs font-semibold leading-none text-white">{cat.label}</span>
           </div>
 
-          {recipe.tags && recipe.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {recipe.tags.slice(0, 3).map(tag => (
-                <span
-                  key={tag}
-                  className="text-xs px-2 py-0.5 rounded-md"
-                  style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+          {photos.length > 1 && (
+            <>
+              <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+              <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-20 pointer-events-none">
+                {photos.map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-full transition-all duration-200"
+                    style={{
+                      width: idx === current ? 16 : 5,
+                      height: 5,
+                      background: idx === current ? 'white' : 'rgba(255,255,255,0.5)',
+                    }}
+                  />
+                ))}
+              </div>
+            </>
           )}
         </div>
-      </Link>
-    </article>
+
+        {/* ── Info ────────────────────────────────────────────── */}
+        <Link
+          to={`/recipes/${recipe.id}`}
+          className="block"
+          onTouchStart={longPress.onTouchStart}
+          onTouchMove={longPress.onTouchMove}
+          onTouchEnd={longPress.onTouchEnd}
+        >
+          <div className="px-4 pt-3 pb-4 space-y-2">
+            <h2 className="recipe-title text-sm leading-snug line-clamp-2" style={{ color: 'var(--text)' }}>
+              {recipe.title}
+            </h2>
+            <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+              <DifficultyStars value={recipe.difficulty ?? 1} size={12} />
+              <div className="flex items-center gap-3">
+                {minutes > 0 && (
+                  <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <Clock size={11} />
+                    {formatMinutes(minutes)}
+                  </span>
+                )}
+                <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
+                  <Users size={11} />
+                  {recipe.servings ?? 4}
+                </span>
+              </div>
+            </div>
+            {recipe.tags && recipe.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {recipe.tags.slice(0, 3).map(tag => (
+                  <span
+                    key={tag}
+                    className="text-xs px-2 py-0.5 rounded-md"
+                    style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </Link>
+      </article>
+
+      {/* Quick actions menu (long press) */}
+      {showMenu && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center p-4" onClick={() => setShowMenu(false)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div
+            className="relative w-full max-w-sm rounded-2xl overflow-hidden"
+            style={{ background: 'var(--surface)', animation: 'slideUp 220ms cubic-bezier(0.34,1.56,0.64,1)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Recipe preview header */}
+            <div
+              className="px-5 py-4 flex items-center gap-3"
+              style={{ borderBottom: '1px solid var(--border)' }}
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                style={{ background: cat.color + '22' }}
+              >
+                {cat.emoji}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="recipe-title text-sm font-semibold leading-snug line-clamp-1" style={{ color: 'var(--text)' }}>
+                  {recipe.title}
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{cat.label}</p>
+              </div>
+              <button
+                onClick={() => setShowMenu(false)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: 'var(--surface-2)' }}
+              >
+                <X size={14} style={{ color: 'var(--text-muted)' }} />
+              </button>
+            </div>
+
+            {/* Actions */}
+            <div className="p-3 space-y-1.5">
+              <button
+                onClick={() => { setShowMenu(false); navigate(`/recipes/${recipe.id}/cook`) }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-white"
+                style={{ background: '#e8572a' }}
+              >
+                <UtensilsCrossed size={18} />
+                Modo Cocinar
+              </button>
+              <button
+                onClick={() => { setShowMenu(false); navigate(`/recipes/${recipe.id}/edit`) }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium"
+                style={{ background: 'var(--surface-2)', color: 'var(--text)' }}
+              >
+                <Edit2 size={16} style={{ color: 'var(--text-muted)' }} />
+                Editar receta
+              </button>
+              <button
+                onClick={handleShare}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium"
+                style={{ background: 'var(--surface-2)', color: 'var(--text)' }}
+              >
+                <Share2 size={16} style={{ color: 'var(--text-muted)' }} />
+                Compartir
+              </button>
+            </div>
+
+            {/* Safe area padding */}
+            <div style={{ height: 'env(safe-area-inset-bottom)' }} />
+          </div>
+        </div>
+      )}
+    </>
   )
 }

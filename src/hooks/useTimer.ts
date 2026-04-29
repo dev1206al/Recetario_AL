@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { TimerState } from '../types'
+import { haptics } from '../lib/haptics'
 
 let timerIdCounter = 0
 
@@ -26,6 +27,7 @@ export function useTimers() {
             osc.start()
             osc.stop(ctx.currentTime + 0.8)
           } catch { /* ignore */ }
+          haptics.success()
           return { ...t, remaining: 0, running: false, done: true }
         }
         return { ...t, remaining: next }

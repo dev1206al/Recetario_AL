@@ -3,15 +3,19 @@ import { supabase } from '../lib/supabase'
 import type { Recipe, RecipeFormData } from '../types'
 import toast from 'react-hot-toast'
 
+export type SortBy = 'recent' | 'az' | 'difficulty'
+
 // ── Fetch all recipes for the logged-in user ─────────────────
-export function useRecipes(search?: string, category?: string) {
+export function useRecipes(search?: string, category?: string, sortBy: SortBy = 'recent') {
   return useQuery({
-    queryKey: ['recipes', search, category],
+    queryKey: ['recipes', search, category, sortBy],
     queryFn: async (): Promise<Recipe[]> => {
+      const orderField = sortBy === 'az' ? 'title' : sortBy === 'difficulty' ? 'difficulty' : 'created_at'
+      const ascending = sortBy === 'az' || sortBy === 'difficulty'
       let query = supabase
         .from('recipes')
         .select('*, photos:recipe_photos(id, url, is_cover, order_index)')
-        .order('created_at', { ascending: false })
+        .order(orderField, { ascending })
 
       if (search) query = query.ilike('title', `%${search}%`)
       if (category && category !== 'all') query = query.eq('category', category)

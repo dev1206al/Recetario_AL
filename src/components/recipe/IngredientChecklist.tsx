@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Check } from 'lucide-react'
 import type { Ingredient } from '../../types'
 import { scaleAmount } from '../../lib/scaleAmount'
+import { haptics } from '../../lib/haptics'
 
 interface IngredientChecklistProps {
   ingredients: Ingredient[]
@@ -14,6 +15,7 @@ export default function IngredientChecklist({ ingredients, interactive = true, s
 
   const toggle = (id: string) => {
     if (!interactive) return
+    haptics.light()
     setChecked(prev => {
       const next = new Set(prev)
       next.has(id) ? next.delete(id) : next.add(id)

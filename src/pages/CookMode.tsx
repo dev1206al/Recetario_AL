@@ -8,6 +8,7 @@ import IngredientChecklist from '../components/recipe/IngredientChecklist'
 import TimerPanel from '../components/recipe/TimerPanel'
 import { CATEGORIES } from '../types'
 import SlidingTabs from '../components/ui/SlidingTabs'
+import { haptics } from '../lib/haptics'
 
 type View = 'ingredients' | 'steps'
 
@@ -259,7 +260,7 @@ export default function CookMode() {
                 {/* Navigation */}
                 <div className="flex gap-3">
                   <button
-                    onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
+                    onClick={() => { haptics.light(); setCurrentStep(s => Math.max(0, s - 1)) }}
                     disabled={currentStep === 0}
                     className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm transition-all disabled:opacity-30"
                     style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text)' }}
@@ -268,7 +269,7 @@ export default function CookMode() {
                     Anterior
                   </button>
                   <button
-                    onClick={() => setCurrentStep(s => Math.min(steps.length - 1, s + 1))}
+                    onClick={() => { haptics.medium(); setCurrentStep(s => Math.min(steps.length - 1, s + 1)) }}
                     disabled={currentStep === steps.length - 1}
                     className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm transition-all disabled:opacity-30"
                     style={{ background: '#e8572a', color: 'white' }}

@@ -340,6 +340,8 @@ export default function RecipeForm() {
                   {...register('servings')}
                   type="number"
                   min={1}
+                  inputMode="numeric"
+                  enterKeyHint="next"
                   className="input-base"
                   placeholder="4"
                 />
@@ -352,6 +354,8 @@ export default function RecipeForm() {
                   {...register('prep_time')}
                   type="number"
                   min={0}
+                  inputMode="numeric"
+                  enterKeyHint="next"
                   className="input-base"
                   placeholder="15"
                 />
@@ -364,6 +368,8 @@ export default function RecipeForm() {
                   {...register('cook_time')}
                   type="number"
                   min={0}
+                  inputMode="numeric"
+                  enterKeyHint="next"
                   className="input-base"
                   placeholder="30"
                 />
@@ -376,6 +382,8 @@ export default function RecipeForm() {
                   {...register('rest_time')}
                   type="number"
                   min={0}
+                  inputMode="numeric"
+                  enterKeyHint="done"
                   className="input-base"
                   placeholder="60"
                 />
@@ -456,8 +464,10 @@ export default function RecipeForm() {
 
                 <input
                   {...register(`ingredients.${idx}.name`)}
+                  enterKeyHint="next"
                   className="input-base"
                   placeholder="Ingrediente *"
+                  onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 320)}
                 />
                 {errors.ingredients?.[idx]?.name && (
                   <p className="text-xs text-red-500">Requerido</p>
@@ -466,8 +476,11 @@ export default function RecipeForm() {
                 <div className="grid grid-cols-2 gap-2">
                   <input
                     {...register(`ingredients.${idx}.amount`)}
+                    inputMode="decimal"
+                    enterKeyHint="next"
                     className="input-base"
-                    placeholder="Cantidad (ej. 200)"
+                    placeholder="Cantidad"
+                    onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 320)}
                   />
                   <UnitInput
                     value={watch(`ingredients.${idx}.unit`) ?? ''}
@@ -536,6 +549,7 @@ export default function RecipeForm() {
                   className="input-base resize-none"
                   rows={3}
                   placeholder={`Describe el paso ${idx + 1}...`}
+                  onFocus={e => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 320)}
                 />
                 {errors.steps?.[idx]?.content && (
                   <p className="text-xs text-red-500">Requerido</p>

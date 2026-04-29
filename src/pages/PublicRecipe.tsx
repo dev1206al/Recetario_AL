@@ -6,7 +6,7 @@ import PhotoGallery from '../components/recipe/PhotoGallery'
 import DifficultyStars from '../components/ui/DifficultyStars'
 import IngredientChecklist from '../components/recipe/IngredientChecklist'
 import { CATEGORIES } from '../types'
-import toast from 'react-hot-toast'
+import { toastCopied, toastShared } from '../lib/toasts'
 
 export default function PublicRecipe() {
   const { id } = useParams<{ id: string }>()
@@ -44,9 +44,10 @@ export default function PublicRecipe() {
     const url = window.location.href
     try {
       await navigator.share({ title: recipe.title, url })
+      toastShared()
     } catch {
       await navigator.clipboard.writeText(url)
-      toast.success('Link copiado al portapapeles')
+      toastCopied()
     }
   }
 

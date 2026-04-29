@@ -14,14 +14,14 @@
     <link rel="apple-touch-icon" href="/logo-al.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Recetario AL" />
-    <!-- "default" adapta el color del texto de la barra de status a claro/oscuro -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- black-translucent: status bar transparent → app draws under it (needs viewport-fit=cover + safe-area padding) -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <!-- Viewport con cover para que la app llegue hasta los bordes -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <!-- Color de la barra del navegador / PWA splash -->
-    <meta name="theme-color" content="#e8572a" />
+    <!-- Color de la barra del navegador / PWA; JS en ThemeContext lo actualiza al cambiar tema -->
+    <meta name="theme-color" content="#1a1d27" />
 
     <title>Recetario AL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -56,7 +56,7 @@ export default function Header({ title, right }: HeaderProps) {
           </Link>
           <button
             onClick={handleSignOut}
-            className="hidden md:flex w-9 h-9 rounded-xl items-center justify-center transition-colors"
+            className="flex w-9 h-9 rounded-xl items-center justify-center transition-colors"
             style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
             aria-label="Cerrar sesión"
           >

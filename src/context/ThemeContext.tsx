@@ -23,6 +23,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       root.classList.remove('dark')
     }
     localStorage.setItem('theme', theme)
+    // Keep status bar / Dynamic Island in sync with theme
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#1a1d27' : '#ffffff')
   }, [theme])
 
   const toggle = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'))
