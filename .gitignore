@@ -17,6 +17,9 @@ dist-ssr
 .env.*
 !.env.example
 
+# Local image assets (not part of the project)
+img/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
