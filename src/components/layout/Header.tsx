@@ -23,7 +23,7 @@ export default function Header({ title, right }: HeaderProps) {
   return (
     <header
       className="sticky top-0 z-40"
-      style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}
+      style={{ background: 'linear-gradient(to bottom, var(--surface) 70%, transparent)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}
     >
       {/* Spacer que "absorbe" la barra de status en modo standalone */}
       <div aria-hidden style={{ height: 'env(safe-area-inset-top)' }} />

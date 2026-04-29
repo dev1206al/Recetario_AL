@@ -108,7 +108,7 @@ export default function PublicRecipe() {
             <span className="text-sm">{cat.emoji}</span>
             <span className="text-xs font-semibold" style={{ color: cat.color }}>{cat.label}</span>
           </div>
-          <h1 className="text-2xl font-bold leading-tight" style={{ color: 'var(--text)' }}>
+          <h1 className="recipe-title text-2xl leading-tight" style={{ color: 'var(--text)' }}>
             {recipe.title}
           </h1>
         </div>

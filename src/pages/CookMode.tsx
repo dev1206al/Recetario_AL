@@ -7,6 +7,7 @@ import { useTheme } from '../context/ThemeContext'
 import IngredientChecklist from '../components/recipe/IngredientChecklist'
 import TimerPanel from '../components/recipe/TimerPanel'
 import { CATEGORIES } from '../types'
+import SlidingTabs from '../components/ui/SlidingTabs'
 
 type View = 'ingredients' | 'steps'
 
@@ -95,25 +96,14 @@ export default function CookMode() {
 
       {/* Tab switch */}
       <div className="mx-auto w-full max-w-5xl px-4 pt-4 flex-shrink-0">
-        <div
-          className="flex rounded-xl overflow-hidden"
-          style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
-        >
-          {(['ingredients', 'steps'] as View[]).map(v => (
-            <button
-              key={v}
-              onClick={() => setView(v)}
-              className="flex-1 py-2.5 text-sm font-semibold transition-all"
-              style={{
-                background: view === v ? '#e8572a' : 'transparent',
-                color: view === v ? 'white' : 'var(--text-muted)',
-                borderRadius: '0.75rem',
-              }}
-            >
-              {v === 'ingredients' ? 'Ingredientes' : 'Pasos'}
-            </button>
-          ))}
-        </div>
+        <SlidingTabs
+          tabs={[
+            { key: 'ingredients', label: 'Ingredientes' },
+            { key: 'steps', label: 'Pasos' },
+          ]}
+          active={view}
+          onChange={setView}
+        />
       </div>
 
       {/* Servings stepper */}
@@ -194,19 +184,24 @@ export default function CookMode() {
                     border: '1.5px solid rgba(232,87,42,0.3)',
                   }}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <div
-                      className="w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                      style={{ background: '#e8572a' }}
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold text-white flex-shrink-0"
+                      style={{ background: '#e8572a', boxShadow: '0 4px 12px rgba(232,87,42,0.4)' }}
                     >
                       {currentStep + 1}
                     </div>
-                    <span className="text-xs font-semibold" style={{ color: '#e8572a' }}>
-                      Paso actual
-                    </span>
+                    <div>
+                      <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#e8572a' }}>
+                        Paso actual
+                      </span>
+                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                        {currentStep + 1} de {steps.length}
+                      </p>
+                    </div>
                   </div>
 
-                  <p className="text-base leading-relaxed" style={{ color: 'var(--text)' }}>
+                  <p className="text-lg leading-relaxed" style={{ color: 'var(--text)' }}>
                     {step.content}
                   </p>
 

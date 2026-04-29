@@ -9,6 +9,7 @@ import IngredientChecklist from '../components/recipe/IngredientChecklist'
 import PhotoGallery from '../components/recipe/PhotoGallery'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import DifficultyStars from '../components/ui/DifficultyStars'
+import SlidingTabs from '../components/ui/SlidingTabs'
 import { CATEGORIES } from '../types'
 import toast from 'react-hot-toast'
 
@@ -81,7 +82,12 @@ export default function RecipeDetail() {
       {/* ── Barra de navegación compacta ────────────────────── */}
       <div
         className="sticky top-0 z-40 no-print"
-        style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}
+        style={{
+          background: `linear-gradient(135deg, ${cat.color}0d 0%, var(--surface) 50%)`,
+          borderBottom: '1px solid var(--border)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+        }}
       >
         <div aria-hidden style={{ height: 'env(safe-area-inset-top)' }} />
         <div className="mx-auto max-w-5xl flex items-center justify-between px-4 h-14">
@@ -145,7 +151,7 @@ export default function RecipeDetail() {
             <span className="text-sm">{cat.emoji}</span>
             <span className="text-xs font-semibold" style={{ color: cat.color }}>{cat.label}</span>
           </div>
-          <h1 className="text-xl font-bold leading-tight" style={{ color: 'var(--text)' }}>{recipe.title}</h1>
+          <h1 className="recipe-title text-2xl leading-tight" style={{ color: 'var(--text)' }}>{recipe.title}</h1>
         </div>
 
         {/* Meta row */}
@@ -235,25 +241,7 @@ export default function RecipeDetail() {
 
         {/* Tabs */}
         <div className="px-4">
-          <div
-            className="flex rounded-xl overflow-hidden"
-            style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
-          >
-            {tabs.map(t => (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className="flex-1 py-2.5 text-sm font-semibold transition-all"
-                style={{
-                  background: tab === t.key ? '#e8572a' : 'transparent',
-                  color: tab === t.key ? 'white' : 'var(--text-muted)',
-                  borderRadius: '0.75rem',
-                }}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
+          <SlidingTabs tabs={tabs} active={tab} onChange={setTab} />
         </div>
 
         <div className="px-4">

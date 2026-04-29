@@ -49,11 +49,16 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
   }
 
   return (
-    <article className="card overflow-hidden transition-transform duration-150 active:scale-[0.98]">
+    <article
+      className="card overflow-hidden transition-all duration-200 active:scale-[0.98]"
+      style={{ ['--hover-shadow' as string]: 'var(--card-shadow-hover)' }}
+      onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)', e.currentTarget.style.transform = 'translateY(-2px)')}
+      onMouseLeave={e => (e.currentTarget.style.boxShadow = '', e.currentTarget.style.transform = '')}
+    >
       {/* ── Foto / Carrusel ─────────────────────────────────── */}
       <div
-        className="relative h-44 overflow-hidden"
-        style={{ background: 'var(--surface-2)' }}
+        className="relative overflow-hidden"
+        style={{ aspectRatio: '4/3', background: 'var(--surface-2)' }}
         onTouchStart={hasPhotos && photos.length > 1 ? onTouchStart : undefined}
         onTouchEnd={hasPhotos && photos.length > 1 ? onTouchEnd : undefined}
       >
@@ -127,7 +132,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
       <Link to={`/recipes/${recipe.id}`} className="block">
         <div className="px-4 pt-3 pb-4 space-y-2">
 
-          <h2 className="font-semibold text-sm leading-snug line-clamp-2" style={{ color: 'var(--text)' }}>
+          <h2 className="recipe-title text-sm leading-snug line-clamp-2" style={{ color: 'var(--text)' }}>
             {recipe.title}
           </h2>
 

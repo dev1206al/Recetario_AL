@@ -2,6 +2,7 @@ import { useState, useDeferredValue } from 'react'
 import { Search, X, ChefHat } from 'lucide-react'
 import Layout from '../components/layout/Layout'
 import RecipeCard from '../components/recipe/RecipeCard'
+import SkeletonCard from '../components/recipe/SkeletonCard'
 import { useRecipes } from '../hooks/useRecipes'
 import { CATEGORIES } from '../types'
 
@@ -73,14 +74,8 @@ export default function Home() {
 
       {/* Results */}
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-3 px-4 pt-2">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="h-56 rounded-2xl animate-pulse"
-              style={{ background: 'var(--surface-2)' }}
-            />
-          ))}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 px-4 pt-2">
+          {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : recipes.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
