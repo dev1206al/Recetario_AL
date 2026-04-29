@@ -6,6 +6,7 @@ import { z } from 'zod'
 import {
   ArrowLeft, Plus, Trash2, GripVertical, ChevronUp, ChevronDown, Timer, Home, Camera, X, Star,
 } from 'lucide-react'
+import UnitInput from '../components/ui/UnitInput'
 import { Link } from 'react-router-dom'
 import { useRecipe, useSaveRecipe, uploadPhoto, savePhotoRecord, deletePhotoRecord, updateCoverUrl } from '../hooks/useRecipes'
 import { useAuth } from '../context/AuthContext'
@@ -416,26 +417,6 @@ export default function RecipeForm() {
         {/* ─── INGREDIENTS ──────────────────────────────────── */}
         {currentSection === 'ingredients' && (
           <div className="space-y-3">
-            <datalist id="unit-options">
-              <option value="g" />
-              <option value="kg" />
-              <option value="ml" />
-              <option value="L" />
-              <option value="taza(s)" />
-              <option value="cucharada(s)" />
-              <option value="cucharadita(s)" />
-              <option value="pizca" />
-              <option value="pz" />
-              <option value="oz" />
-              <option value="lb" />
-              <option value="sobre(s)" />
-              <option value="rebanada(s)" />
-              <option value="diente(s)" />
-              <option value="rama(s)" />
-              <option value="hoja(s)" />
-              <option value="al gusto" />
-              <option value="paquete(s)" />
-            </datalist>
             {ingredientFields.map((field, idx) => (
               <div key={field.id} className="card p-3 space-y-2">
                 <div className="flex items-center gap-2">
@@ -488,12 +469,9 @@ export default function RecipeForm() {
                     className="input-base"
                     placeholder="Cantidad (ej. 200)"
                   />
-                  <input
-                    {...register(`ingredients.${idx}.unit`)}
-                    list="unit-options"
-                    className="input-base"
-                    placeholder="Unidad"
-                    autoComplete="off"
+                  <UnitInput
+                    value={watch(`ingredients.${idx}.unit`) ?? ''}
+                    onChange={val => setValue(`ingredients.${idx}.unit`, val)}
                   />
                 </div>
               </div>
