@@ -142,7 +142,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           onTouchMove={longPress.onTouchMove}
           onTouchEnd={longPress.onTouchEnd}
         >
-          <div className="px-3 pt-3 pb-3 flex flex-col gap-1.5" style={{ height: 76 }}>
+          <div className="px-3 pt-3 pb-4 flex flex-col gap-1.5" style={{ height: 88 }}>
             <h2 className="recipe-title text-sm leading-snug line-clamp-1 flex-shrink-0" style={{ color: 'var(--text)' }}>
               {recipe.title}
             </h2>
