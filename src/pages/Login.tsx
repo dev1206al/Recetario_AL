@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Sun, Moon } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
-import { Sun, Moon } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function Login() {
@@ -12,6 +11,7 @@ export default function Login() {
   const { theme, toggle } = useTheme()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
   const [mode, setMode] = useState<'login' | 'register'>('login')
@@ -20,6 +20,19 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (mode === 'register') {
+      const clean = username.trim().toLowerCase().replace(/[^a-z0-9_]/g, '')
+      if (clean.length < 3) {
+        toast.error('El usuario debe tener al menos 3 caracteres (letras, números o _)')
+        return
+      }
+      if (clean !== username.trim()) {
+        toast.error('Solo se permiten letras, números y guión bajo')
+        return
+      }
+    }
+
     setLoading(true)
     try {
       if (mode === 'login') {
@@ -27,12 +40,19 @@ export default function Login() {
         if (error) throw error
         toast.success('¡Bienvenido de vuelta!')
       } else {
-        const { error } = await supabase.auth.signUp({ email, password })
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { username: username.trim().toLowerCase() } },
+        })
         if (error) throw error
-        toast.success('Cuenta creada. Revisa tu email para confirmar.')
+        toast.success('Cuenta creada. Revisa tu correo para confirmar.')
       }
     } catch (error: unknown) {
-      toast.error((error as Error).message)
+      const msg = (error as Error).message
+      if (msg.includes('already registered')) toast.error('Este email ya está registrado')
+      else if (msg.includes('Password')) toast.error('La contraseña debe tener al menos 6 caracteres')
+      else toast.error(msg)
     } finally {
       setLoading(false)
     }
@@ -43,7 +63,6 @@ export default function Login() {
       className="min-h-dvh flex flex-col items-center justify-center px-6 py-12"
       style={{ background: 'var(--bg)' }}
     >
-      {/* Theme toggle */}
       <button
         onClick={toggle}
         className="fixed top-5 right-5 w-9 h-9 rounded-xl flex items-center justify-center"
@@ -63,14 +82,12 @@ export default function Login() {
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
               Recetario <span style={{ color: '#e8572a' }}>AL</span>
             </h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              Tu cocina, tus recetas
-            </p>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Tu cocina, tus recetas</p>
           </div>
         </div>
 
-        {/* Card */}
         <div className="card p-6 space-y-5">
+          {/* Tab toggle */}
           <div className="flex rounded-xl overflow-hidden" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
             {(['login', 'register'] as const).map(m => (
               <button
@@ -89,6 +106,36 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Username — solo en registro */}
+            {mode === 'register' && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+                  Usuario
+                </label>
+                <div className="relative">
+                  <span
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium select-none"
+                    style={{ color: 'var(--text-muted)' }}
+                  >@</span>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={e => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                    className="input-base pl-8"
+                    placeholder="mi_usuario"
+                    required
+                    autoComplete="username"
+                    autoCapitalize="none"
+                    minLength={3}
+                    maxLength={20}
+                  />
+                </div>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  Letras, números y _ · mínimo 3 caracteres
+                </p>
+              </div>
+            )}
+
             <div className="space-y-1.5">
               <label className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
                 Email
@@ -101,6 +148,7 @@ export default function Login() {
                 placeholder="tu@email.com"
                 required
                 autoComplete="email"
+                inputMode="email"
               />
             </div>
 
@@ -116,6 +164,7 @@ export default function Login() {
                   className="input-base pr-12"
                   placeholder="••••••••"
                   required
+                  minLength={6}
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                 />
                 <button
@@ -132,7 +181,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl font-semibold text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full py-3.5 rounded-xl font-semibold text-white transition-all disabled:opacity-60"
               style={{ background: '#e8572a' }}
             >
               {loading ? (

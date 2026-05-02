@@ -12,6 +12,7 @@ import DifficultyStars from '../components/ui/DifficultyStars'
 import SlidingTabs from '../components/ui/SlidingTabs'
 import { CATEGORIES } from '../types'
 import { toastCopied, toastShared } from '../lib/toasts'
+import { useAuth } from '../context/AuthContext'
 
 type Tab = 'ingredientes' | 'pasos' | 'notas'
 
@@ -21,6 +22,7 @@ export default function RecipeDetail() {
   const { data: recipe, isLoading } = useRecipe(id)
   const deleteRecipe = useDeleteRecipe()
   const togglePublic = useTogglePublic()
+  const { user } = useAuth()
   const [tab, setTab] = useState<Tab>('ingredientes')
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [localServings, setLocalServings] = useState<number | null>(null)
@@ -151,6 +153,11 @@ export default function RecipeDetail() {
           <div className="flex items-center gap-1.5">
             <span className="text-sm">{cat.emoji}</span>
             <span className="text-xs font-semibold" style={{ color: cat.color }}>{cat.label}</span>
+            {recipe.user_id !== user?.id && recipe.author && (
+              <span className="text-xs font-medium ml-1" style={{ color: 'var(--text-muted)' }}>
+                · <span style={{ color: '#e8572a' }}>@{recipe.author.username}</span>
+              </span>
+            )}
           </div>
           <h1 className="recipe-title text-2xl leading-tight" style={{ color: 'var(--text)' }}>{recipe.title}</h1>
         </div>

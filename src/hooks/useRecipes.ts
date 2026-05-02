@@ -18,7 +18,7 @@ export function useRecipes(search?: string, category?: string, sortBy: SortBy = 
     queryFn: async ({ pageParam }): Promise<Recipe[]> => {
       let query = supabase
         .from('recipes')
-        .select('*, photos:recipe_photos(id, url, is_cover, order_index)')
+        .select('*, photos:recipe_photos(id, url, is_cover, order_index), author:profiles(username, display_name)')
         .order(orderField, { ascending })
         .range(pageParam, pageParam + PAGE_SIZE - 1)
 

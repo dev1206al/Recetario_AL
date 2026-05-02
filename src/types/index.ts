@@ -49,6 +49,13 @@ export interface RecipePhoto {
   order_index: number
 }
 
+export interface Profile {
+  id: string
+  username: string
+  display_name: string | null
+  created_at: string
+}
+
 export interface Recipe {
   id: string
   user_id: string
@@ -69,6 +76,7 @@ export interface Recipe {
   ingredients?: Ingredient[]
   steps?: Step[]
   photos?: RecipePhoto[]
+  author?: { username: string; display_name: string | null }
 }
 
 export interface RecipeFormData {

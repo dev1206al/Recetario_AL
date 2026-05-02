@@ -7,6 +7,7 @@ import { formatMinutes, totalMinutes, useTogglePublic } from '../../hooks/useRec
 import DifficultyStars from '../ui/DifficultyStars'
 import { useLongPress } from '../../hooks/useLongPress'
 import { toastCopied, toastShared } from '../../lib/toasts'
+import { useAuth } from '../../context/AuthContext'
 
 interface RecipeCardProps {
   recipe: Recipe
@@ -17,7 +18,10 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
   const minutes = totalMinutes(recipe)
   const navigate = useNavigate()
   const togglePublic = useTogglePublic()
+  const { user } = useAuth()
   const [showMenu, setShowMenu] = useState(false)
+  const isOwn = recipe.user_id === user?.id
+  const authorLabel = !isOwn && recipe.author ? `@${recipe.author.username}` : null
 
   const photos = [...(recipe.photos ?? [])].sort((a, b) => {
     if (a.is_cover && !b.is_cover) return -1
@@ -147,17 +151,24 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
               {recipe.title}
             </h2>
             <DifficultyStars value={recipe.difficulty ?? 1} size={12} />
-            <div className="flex items-center gap-3">
-              {minutes > 0 && (
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-3">
+                {minutes > 0 && (
+                  <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <Clock size={11} />
+                    {formatMinutes(minutes)}
+                  </span>
+                )}
                 <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
-                  <Clock size={11} />
-                  {formatMinutes(minutes)}
+                  <Users size={11} />
+                  {recipe.servings ?? 4}
+                </span>
+              </div>
+              {authorLabel && (
+                <span className="text-xs font-medium truncate" style={{ color: '#e8572a' }}>
+                  {authorLabel}
                 </span>
               )}
-              <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
-                <Users size={11} />
-                {recipe.servings ?? 4}
-              </span>
             </div>
           </div>
         </Link>
