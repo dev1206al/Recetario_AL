@@ -112,7 +112,7 @@ export default function Home() {
 
       {/* Results */}
       {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 px-4 pt-2">
+        <div className="recipe-grid px-4 pt-2">
           {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : recipes.length === 0 ? (
@@ -157,7 +157,7 @@ export default function Home() {
             {recipes.length} {recipes.length === 1 ? 'receta' : 'recetas'}
             {hasNextPage && ' · desliza para más'}
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="recipe-grid">
             {recipes.map((recipe, i) => (
               <div
                 key={recipe.id}

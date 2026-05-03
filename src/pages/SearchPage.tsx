@@ -114,7 +114,7 @@ export default function SearchPage() {
           <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>
             {recipes.length} {recipes.length === 1 ? 'receta' : 'recetas'}
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="recipe-grid">
             {recipes.map((recipe, i) => (
               <div
                 key={recipe.id}

@@ -115,11 +115,11 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
 
           {/* Badge categoría */}
           <div
-            className="absolute top-2 left-2 z-20 pointer-events-none flex items-center gap-1 px-2 py-1 rounded-lg backdrop-blur-sm"
+            className="absolute top-2 left-2 z-20 pointer-events-none flex items-center gap-1 px-1.5 py-0.5 rounded-md backdrop-blur-sm max-w-[90%]"
             style={{ background: cat.color + 'cc' }}
           >
-            <span className="text-xs leading-none">{cat.emoji}</span>
-            <span className="text-xs font-semibold leading-none text-white">{cat.label}</span>
+            <span className="text-xs leading-none shrink-0">{cat.emoji}</span>
+            <span className="text-xs font-semibold leading-none text-white truncate">{cat.label}</span>
           </div>
 
           {photos.length > 1 && (
@@ -146,26 +146,24 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           onTouchMove={longPress.onTouchMove}
           onTouchEnd={longPress.onTouchEnd}
         >
-          <div className="px-3 pt-3 pb-4 flex flex-col gap-1.5" style={{ height: 88 }}>
-            <h2 className="recipe-title text-sm leading-snug line-clamp-1 flex-shrink-0" style={{ color: 'var(--text)' }}>
+          <div className="px-3 pt-2.5 pb-3 flex flex-col gap-1">
+            <h2 className="recipe-title text-sm leading-snug line-clamp-1" style={{ color: 'var(--text)' }}>
               {recipe.title}
             </h2>
-            <DifficultyStars value={recipe.difficulty ?? 1} size={12} />
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-3">
-                {minutes > 0 && (
-                  <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
-                    <Clock size={11} />
-                    {formatMinutes(minutes)}
-                  </span>
-                )}
-                <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
-                  <Users size={11} />
-                  {recipe.servings ?? 4}
+            <DifficultyStars value={recipe.difficulty ?? 1} size={11} />
+            <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+              {minutes > 0 && (
+                <span className="flex items-center gap-0.5 text-xs shrink-0" style={{ color: 'var(--text-muted)' }}>
+                  <Clock size={10} />
+                  {formatMinutes(minutes)}
                 </span>
-              </div>
+              )}
+              <span className="flex items-center gap-0.5 text-xs shrink-0" style={{ color: 'var(--text-muted)' }}>
+                <Users size={10} />
+                {recipe.servings ?? 4}
+              </span>
               {authorLabel && (
-                <span className="text-xs font-medium truncate" style={{ color: '#e8572a' }}>
+                <span className="text-xs font-medium truncate min-w-0" style={{ color: '#e8572a' }}>
                   {authorLabel}
                 </span>
               )}

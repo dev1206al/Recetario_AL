@@ -121,6 +121,13 @@
     padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
   }
 
+  /* Grid fluido: 2 columnas desde ~300px, 3 desde ~520px, 4 desde ~720px */
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 42vw, 220px), 1fr));
+    gap: 0.75rem;
+  }
+
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
