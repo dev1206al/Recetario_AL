@@ -8,6 +8,7 @@ export type Category =
   | 'postres'
   | 'reposteria'
   | 'bebidas'
+  | 'jugos'
   | 'otros'
 
 export const CATEGORIES: Record<Category, { label: string; color: string; emoji: string }> = {
@@ -20,6 +21,7 @@ export const CATEGORIES: Record<Category, { label: string; color: string; emoji:
   'postres':       { label: 'Postres',                  color: '#ec4899', emoji: '🍮' },
   'reposteria':    { label: 'Repostería & Panadería',   color: '#a855f7', emoji: '🎂' },
   'bebidas':       { label: 'Bebidas',                  color: '#06b6d4', emoji: '🥤' },
+  'jugos':         { label: 'Jugos & Licuados',         color: '#84cc16', emoji: '🥝' },
   'otros':         { label: 'Otros',                    color: '#6b7280', emoji: '🍴' },
 }
 
